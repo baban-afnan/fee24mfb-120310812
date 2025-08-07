@@ -29,10 +29,10 @@ class BVNmodification extends Model
     ];
 
     // Define statusHistory as an Eloquent relationship method
-    public function statusHistory()
-    {
-        return $this->hasMany(StatusHistory::class, 'id');
-    }
+    // public function statusHistory()
+    // {
+    //     return $this->hasMany(StatusHistory::class, 'id');
+    // }
       
 
  public function modificationField()

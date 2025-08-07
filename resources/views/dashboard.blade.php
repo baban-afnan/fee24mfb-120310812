@@ -30,7 +30,7 @@
                                     $totalDebit = \App\Models\Transaction::where('type', 'debit')->sum('amount');
                                     $totalTransactions = \App\Models\Transaction::count();
                                     $activeServices = \App\Models\ModificationField::where('is_active', 1)->count();
-                                    $bvnModifications = \App\Models\BvnModification::count();
+                                    $bvnModifications = \App\Models\BVNmodification::count();
                                     
                                     // Calculate trends (you would replace these with your actual trend logic)
                                     $userTrend = ($totalUsers > 0) ? round(($totalUsers / ($totalUsers + rand(10, 50))) * 100, 2) : 0;
