@@ -1,0 +1,111 @@
+   /* Base Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        /* Primary Button */
+        .btn-default {
+            color: white;
+            background: linear-gradient(135deg, #8A2BE2 0%, #A569BD 100%);
+        }
+
+        .btn-default:hover {
+            color: white;
+            background: linear-gradient(135deg, #7B1FA2 0%, #8E44AD 100%);
+            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-default:active {
+            background: linear-gradient(135deg, #6A1B9A 0%, #7D3C98 100%);
+            box-shadow: 0 2px 4px rgba(138, 43, 226, 0.3);
+            transform: translateY(0);
+        }
+
+        /* default2 Button */
+        .btn-default2 {
+            color: #8A2BE2;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-default2:hover {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+            border-color: #d0d0d0;
+        }
+
+        .btn-default2:active {
+            background: linear-gradient(135deg, #e8e8e8 0%, #e0e0e0 100%);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+
+        /* Processing State */
+        .btn-processing {
+            pointer-events: none;
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn-processing::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .btn-default2.btn-processing::after {
+            border: 3px solid rgba(138, 43, 226, 0.1);
+            border-top-color: #8A2BE2;
+        }
+
+        /* Focus State */
+        .btn:focus-visible {
+            outline: 2px solid #8A2BE2;
+            outline-offset: 2px;
+        }
+
+        /* Disabled State */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Animation */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Container for demo */
+        .button-container {
+            display: flex;
+            gap: 16px;
+            padding: 24px;
+        }
