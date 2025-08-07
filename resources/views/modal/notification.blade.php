@@ -1,19 +1,24 @@
 @php
     use Illuminate\Support\Facades\DB;
 
-    $pendingServicesCount = DB::table('bvn_user')
-        ->where('status', 'pending')
-        ->count();
+    $pendingServicesCount = DB::table('bvn_modification')->where('status', 'pending')->count();
+    $pendingServicesCount1 = DB::table('bvn_crm')->where('status', 'pending')->count();
+    $pendingServicesCount2 = DB::table('bvn_user')->where('status', 'pending')->count();
+    $pendingServicesCount3 = DB::table('nin_modifications')->where('status', 'pending')->count();
+    $pendingServicesCount4 = DB::table('nin_ipe')->where('status', 'pending')->count();
+    $pendingServicesCount5 = DB::table('bvn_search')->where('status', 'pending')->count();
+    $pendingServicesCount6 = DB::table('send_vnin')->where('status', 'pending')->count();
+    $pendingServicesCount7 = DB::table('nin_validation')->where('status', 'pending')->count();
 
-
-         $pendingServicesCount = DB::table('bvn_modification')
-        ->where('status', 'pending')
-        ->count();
+    $totalPending = $pendingServicesCount + $pendingServicesCount1 + $pendingServicesCount2 + 
+                    $pendingServicesCount3 + $pendingServicesCount4 + $pendingServicesCount5 + 
+                    $pendingServicesCount6 + $pendingServicesCount7;
 
     $systemSize = number_format((disk_total_space("/") - disk_free_space("/")) / 1048576, 2); // MB used
     $totalSize = number_format(disk_total_space("/") / 1048576, 2); // MB total
 @endphp
 
+@if($totalPending > 0)
 <!-- Welcome Modal -->
 <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -30,44 +35,146 @@
                 <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
                     <i class="bi bi-exclamation-circle-fill me-2 fs-4"></i>
                     <div>
-                        <strong>Urgent Action Required:</strong> There are <strong>{{ $pendingServicesCount }}</strong> pending service(s) waiting for your response.
+                        <strong>Urgent Action Required:</strong> You have a total of 
+                        <strong>{{ $totalPending }}</strong> pending request(s) across all services.
+                        <br><span class="text-primary fw-semibold">Act now to avoid delays and ensure a smooth workflow.</span>
                     </div>
                 </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6 mb-3">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body py-3">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-hdd-network fs-2 text-info me-3"></i>
-                                    <div>
-                                        <h6 class="mb-0">System Usage</h6>
-                                        <small>{{ $systemSize }} MB used of {{ $totalSize }} MB</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
+                
+                <div class="row">
+                    @if($pendingServicesCount > 0)
                     <div class="col-md-6 mb-3">
                         <div class="card shadow-sm border-0">
                             <div class="card-body py-3">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
                                     <div>
-                                        <h6 class="mb-0">Pending Requests</h6>
+                                        <h6 class="mb-0">Pending BVN Modifications</h6>
                                         <small>{{ $pendingServicesCount }} Service(s) in queue</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @endif
 
+                    @if($pendingServicesCount1 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending BVN CRM</h6>
+                                        <small>{{ $pendingServicesCount1 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
-                <ul class="list-group list-group-flush">
+                    @if($pendingServicesCount2 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending BVN User</h6>
+                                        <small>{{ $pendingServicesCount2 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($pendingServicesCount3 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending NIN Modification</h6>
+                                        <small>{{ $pendingServicesCount3 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($pendingServicesCount4 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending IPE</h6>
+                                        <small>{{ $pendingServicesCount4 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($pendingServicesCount5 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending BVN Search</h6>
+                                        <small>{{ $pendingServicesCount5 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($pendingServicesCount6 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending Send VNIN to NIBSS</h6>
+                                        <small>{{ $pendingServicesCount6 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($pendingServicesCount7 > 0)
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock-history fs-2 text-secondary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Pending NIN Validation</h6>
+                                        <small>{{ $pendingServicesCount7 }} Service(s) in queue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <ul class="list-group list-group-flush mt-3">
                     <li class="list-group-item d-flex align-items-center">
                         <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
-                        Server Maintenance Scheduled
+                        know that only 80% of the above service Fee will be refunded, follow up on processing request
                     </li>
                     <li class="list-group-item d-flex align-items-center">
                         <i class="bi bi-moon-stars-fill text-dark me-2"></i>
@@ -95,49 +202,12 @@
 <!-- Show Modal Script -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Simple check for dashboard page (customize as needed)
     if (window.location.pathname.includes('dashboard')) {
         setTimeout(() => {
-            // Create modal instance and show
             const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
             welcomeModal.show();
-            
-            // Optional: Store in localStorage to prevent showing again today
-            localStorage.setItem('welcomeModalShown', new Date().toDateString());
-        }, 300); // 30 seconds = 30000 milliseconds
+        }, 3000); 
     }
 });
 </script>
-
-<!-- Modal Styles -->
-<style>
-    #welcomeModal .modal-content {
-        animation: fadeIn 0.4s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .modal-header.bg-gradient {
-        background: linear-gradient(90deg, #0062cc, #0056b3);
-    }
-
-    .list-group-item {
-        transition: background-color 0.2s ease;
-        cursor: default;
-    }
-
-    .list-group-item:hover {
-        background-color: #f1f3f5;
-    }
-
-    .card-body h6 {
-        font-weight: 600;
-    }
-
-    .modal-footer .btn i {
-        vertical-align: middle;
-    }
-</style>
+@endif
