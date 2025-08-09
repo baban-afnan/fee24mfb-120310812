@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Userscontrol;
+use App\Models\UserScontrol;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\VirtualAccount;
@@ -11,14 +11,14 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class ManageUsersController extends Controller
+class ManageUserScontroller extends Controller
 {
     public function index(Request $request)
     {
         $searchemail = $request->input('search_email');
         $statusFilter = $request->input('status');
 
-        $query = Userscontrol::query();
+        $query = UserScontrol::query();
 
         if ($searchemail) {
             $query->where('email', 'like', "%$searchemail%");
@@ -31,9 +31,9 @@ class ManageUsersController extends Controller
         $enrollments = $query->orderByDesc('created_at')->paginate(10);
 
         $statusCounts = [
-            'inactive' => Userscontrol::where('status', 'inactive')->count(),
-            'suspended' => Userscontrol::where('status', 'suspended')->count(),
-            'active' => Userscontrol::where('status', 'active')->count(),
+            'inactive' => UserScontrol::where('status', 'inactive')->count(),
+            'suspended' => UserScontrol::where('status', 'suspended')->count(),
+            'active' => UserScontrol::where('status', 'active')->count(),
         ];
 
         return view('users', compact('enrollments', 'searchemail', 'statusFilter', 'statusCounts'));
@@ -41,7 +41,7 @@ class ManageUsersController extends Controller
 
     public function show($id)
     {
-        $user = Userscontrol::findOrFail($id);
+        $user = UserScontrol::findOrFail($id);
         $agent = $user->user_id ? User::find($user->user_id) : null;
         $wallet = Wallet::where('user_id', $id)->first();
         $virtualAccount = VirtualAccount::where('user_id', $id)->first();
@@ -81,7 +81,7 @@ class ManageUsersController extends Controller
     DB::beginTransaction();
 
     try {
-        $user = Userscontrol::findOrFail($id);
+        $user = UserScontrol::findOrFail($id);
         $updates = [];
         $messageParts = [];
 
