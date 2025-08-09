@@ -59,99 +59,115 @@ class CRMController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,processing,resolved,rejected',
-            'comment' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'status' => 'required|in:pending,processing,resolved,rejected',
+        'comment' => 'nullable|string',
+    ]);
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-            $enrollment = CRMrequest::findOrFail($id);
-            $oldStatus = $enrollment->status;
+    try {
+        $enrollment = CRMrequest::findOrFail($id);
+        $oldStatus = $enrollment->status;
+        $messageParts = [];
 
-            // Update status and comment
+        // Update status
+        if ($request->status !== $oldStatus) {
             $enrollment->status = $request->status;
+            $messageParts[] = "status to {$request->status}";
+        }
+
+        // Update comment
+        if ($request->filled('comment') && $request->comment !== $enrollment->comment) {
             $enrollment->comment = $request->comment;
-            $enrollment->save();
+            $messageParts[] = "comment updated";
+        }
 
-            // Refund logic on rejection
-            if ($request->status === 'rejected' && $oldStatus !== 'rejected') {
-                $modificationFieldId = $enrollment->modification_field_id;
-                $user = User::find($enrollment->user_id);
+        $enrollment->save();
 
-                if (!$user) {
-                    throw new \Exception('User not found.');
-                }
+        // Refund logic on rejection
+        if ($request->status === 'rejected' && $oldStatus !== 'rejected') {
+            $modificationFieldId = $enrollment->modification_field_id;
+            $user = User::find($enrollment->user_id);
 
-                if (!$modificationFieldId) {
-                    throw new \Exception('Modification field ID is missing.');
-                }
-
-                $modField = ModificationField::find($modificationFieldId);
-                if (!$modField) {
-                    throw new \Exception('Modification field not found.');
-                }
-
-                $fieldCode = $modField->service_id;
-                if (!$fieldCode) {
-                    throw new \Exception('Field code is missing in modification field.');
-                }
-
-                $role = strtolower($user->role ?? 'default');
-
-                // Try to get price for this role and service_id
-                $servicePrice = DB::table('service_prices')
-                    ->where('service_id', $fieldCode)
-                    ->where('user_type', $role)
-                    ->value('price');
-
-                // Fallback to base_price if no service price found
-                $basePrice = $servicePrice ?? $modField->base_price;
-
-                if (!$basePrice) {
-                    throw new \Exception("No price found for role '{$role}' and field code '{$fieldCode}', and base price is also missing.");
-                }
-
-                // Refund 80% of the base price
-                $refundAmount = round($basePrice * 0.8, 2);
-                $debitAmount = round($basePrice * 0.2, 2);
-
-                $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
-                if (!$wallet) {
-                    throw new \Exception('Wallet not found for user.');
-                }
-
-                $wallet->wallet_balance += $refundAmount;
-                $wallet->save();
-
-                Transaction::create([
-                    'transaction_ref' => strtoupper(Str::random(12)),
-                    'user_id' => $user->id,
-                    'performed_by' => Auth::user()->first_name . ' ' . (Auth::user()->last_name ?? ''),
-                    'amount' => $refundAmount,
-                    'fee' => 0.00,
-                    'net_amount' => $refundAmount,
-                    'description' => "Refund 80% for rejected service [{$modField->field_name}], Enrollment ID #{$enrollment->id}",
-                    'type' => 'refund',
-                    'status' => 'completed',
-                    'metadata' => json_encode([
-                        'service_id' => $fieldCode,
-                        'field_name' => $modField->field_name ?? null,
-                        'user_role' => $role,
-                        'base_price' => $basePrice,
-                        'percentage_refunded' => 80,
-                        'amount_debited_by_system' => $debitAmount,
-                    ]),
-                ]);
+            if (!$user) {
+                throw new \Exception('User not found.');
+            }
+            if (!$modificationFieldId) {
+                throw new \Exception('Modification field ID is missing.');
             }
 
-            DB::commit();
-            return redirect()->back()->with('successMessage', 'Status updated successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
+            $modField = ModificationField::find($modificationFieldId);
+            if (!$modField) {
+                throw new \Exception('Modification field not found.');
+            }
+
+            $fieldCode = $modField->service_id;
+            if (!$fieldCode) {
+                throw new \Exception('Field code is missing in modification field.');
+            }
+
+            $role = strtolower($user->role ?? 'default');
+
+            // Get service price for this role or use base price
+            $servicePrice = DB::table('service_prices')
+                ->where('service_id', $fieldCode)
+                ->where('user_type', $role)
+                ->value('price');
+
+            $basePrice = $servicePrice ?? $modField->base_price;
+
+            if (!$basePrice) {
+                throw new \Exception("No price found for role '{$role}' and field code '{$fieldCode}', and base price is missing.");
+            }
+
+            // Refund 80% logic
+            $refundAmount = round($basePrice * 0.8, 2);
+            $debitAmount = round($basePrice * 0.2, 2);
+
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+            if (!$wallet) {
+                throw new \Exception('Wallet not found for user.');
+            }
+
+            $wallet->wallet_balance += $refundAmount;
+            $wallet->save();
+
+            Transaction::create([
+                'transaction_ref' => strtoupper(Str::random(12)),
+                'user_id' => $user->id,
+                'performed_by' => Auth::user()->first_name . ' ' . (Auth::user()->last_name ?? ''),
+                'amount' => $refundAmount,
+                'fee' => 0.00,
+                'net_amount' => $refundAmount,
+                'description' => "Refund 80% for rejected service [{$modField->field_name}], Enrollment ID #{$enrollment->id}",
+                'type' => 'refund',
+                'status' => 'completed',
+                'metadata' => json_encode([
+                    'service_id' => $fieldCode,
+                    'field_name' => $modField->field_name ?? null,
+                    'user_role' => $role,
+                    'base_price' => $basePrice,
+                    'percentage_refunded' => 80,
+                    'amount_debited_by_system' => $debitAmount,
+                ]),
+            ]);
+
+            $messageParts[] = "80% refund issued";
         }
+
+        DB::commit();
+
+        $successMessage = $messageParts
+            ? 'Successfully updated ' . implode(', ', $messageParts)
+            : 'No changes were made';
+
+        return redirect()->route('crmreg.index')->with('successMessage', $successMessage);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->route('crmreg.index')->with('errorMessage', 'Failed to update: ' . $e->getMessage());
     }
+}
 }

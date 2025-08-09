@@ -74,7 +74,7 @@
         </div>
       </li>
       <li class="sidebar-list">
-         <a class="sidebar-link" href="">
+         <a class="sidebar-link" href="{{route('services.management')}}">
           <i class="fas fa-person fa-lg sidebar-icon"></i>
           <h6 class="sidebar-text f-w-600">Management</h6>
         </a>

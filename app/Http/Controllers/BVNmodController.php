@@ -148,10 +148,10 @@ class BVNmodController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('successMessage', 'Status updated successfully.');
+            return redirect()->route('bvnmod.index')->with('successMessage', 'Status updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
+            return redirect()->route('bvnmod.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
         }
     }
 }

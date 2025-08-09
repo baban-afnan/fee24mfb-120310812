@@ -148,10 +148,10 @@ class SendVninToNibssController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('successMessage', 'Status updated successfully.');
+            return redirect()->route('sendvnin.index')->with('successMessage', 'Status updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
+            return redirect()->route('sendvnin.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
         }
     }
 }

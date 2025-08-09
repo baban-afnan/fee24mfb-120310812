@@ -25,4 +25,9 @@ class ServiceController extends Controller
     {
         return view('vip-services');
     }
+
+     public function management()
+    {
+        return view('management');
+    }
 }

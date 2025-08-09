@@ -1,16 +1,15 @@
 <x-app-layout>
-    <x-slot name="title">Vnin Control Form</x-slot>
-
+<x-slot name="title">BVN CRM Control Form</x-slot>
 
 <div class="row g-4 mb-4">
 
-    <div class="col-md-3">
-        <div class="card text-white bg-primary h-100 shadow-sm border-0">
+   <div class="col-md-3">
+        <div class="card text-white bg-success h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-hourglass-split fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Pending</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['pending'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Work on this request its Urgent!</small>
+                <small class="text-uppercase fw-bold">You have did a great Job</small>
+                <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
+                <h6 class="text-uppercase fw-bold">USERS</h6>
+                <h4 class="fw-bold mb-0">{{ $statusCounts['active'] ?? 0 }}</h4>
             </div>
         </div>
     </div>
@@ -19,20 +18,9 @@
         <div class="card text-white bg-info h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
                 <i class="bi bi-gear-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Processing</h6>
-                <small class="text-uppercase fw-bold">Check and confirm The status</small>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['processing'] ?? 0 }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-success h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <small class="text-uppercase fw-bold">You have did a great Job</small>
-                <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Resolved</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['resolved'] ?? 0 }}</h4>
+                <h6 class="text-uppercase fw-bold">Inactive Users</h6>
+                <small class="text-uppercase fw-bold">Call them and follow up</small>
+                <h4 class="fw-bold mb-0">{{ $statusCounts['inactive'] ?? 0 }}</h4>
             </div>
         </div>
     </div>
@@ -41,9 +29,9 @@
         <div class="card text-white bg-danger h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
                 <i class="bi bi-x-octagon-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Rejected</h6>
-                <h4 class="fw-bold mb-2">{{ $statusCounts['rejected'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Don’t give up — Kept accepting Request</small>
+                <h6 class="text-uppercase fw-bold">Suspended</h6>
+                <h4 class="fw-bold mb-2">{{ $statusCounts['suspended'] ?? 0 }}</h4>
+                <small class="text-uppercase fw-bold">Don’t give up — Motivate them push more</small>
             </div>
         </div>
     </div>
@@ -54,7 +42,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">VNIN Enrollment Records</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Users</h6>
         <div class="dropdown no-arrow">
             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical text-gray-400"></i>
@@ -75,7 +63,7 @@
             <div class="col-md-6">
                 <form method="GET" class="form-inline search-full col">
                     <div class="input-group">
-                        <input type="text" name="search_bvn" class="form-control" placeholder="Search by BVN..." value="{{ request('search_bvn') }}">
+                        <input type="text" name="search_email" class="form-control" placeholder="Search by email..." value="{{ request('search_email') }}">
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -91,7 +79,7 @@
                         {{ request('status') ? 'Filter: ' . ucfirst(request('status')) : 'Filters' }}
                     </button>
 
-                    @if(request('status') || request('search_bvn'))
+                    @if(request('status') || request('search_email'))
                         <a href="{{ route('sendvnin.index') }}" class="btn btn-outline-danger">
                             <i class="bi bi-x-circle"></i> Clear
                         </a>
@@ -101,7 +89,6 @@
         </div>
 
         {{-- Errors --}}
-         {{-- Errors --}}
          @if (session('errorMessage'))
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <strong>Error!</strong> {{ session('errorMessage') }}
@@ -116,16 +103,15 @@
       </div>
       @endif
 
-
         {{-- Table --}}
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>BVN</th>
-                        <th>VNIN</th>
-                        <th>Field</th>
+                        <th>Full Name</th>
+                        <th>Phone NO</th>
+                        <th>Email</th>
                         <th>Status</th>
                         <th>Date Created</th>
                         <th>Actions</th>
@@ -135,18 +121,15 @@
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>
-                            <td>{{ $enrollment->bvn }}</td>
-                            <td>{{ $enrollment->nin }}</td>
-                            <td>{{ $enrollment->field }}</td>
+                            <td>{{ $enrollment->first_name }}   {{ $enrollment->last_name }}</td>
+                            <td>{{ $enrollment->phone_no }}</td>
+                            <td>{{ $enrollment->email }}</td>
                             <td>
                                 @php
                                     $statusColor = match($enrollment->status) {
-                                         'pending' => 'warning',
-                                         'processing' => 'info',
-                                         'resolved' => 'success',
-                                         'rejected' => 'danger',
-                                         'query' => 'info',
-                                         'remark' => 'primary',
+                                        'active' => 'success',
+                                        'inactive' => 'warning',
+                                        'suspended' => 'danger',
                                         default => 'secondary'
                                     };
                                 @endphp
@@ -156,7 +139,7 @@
                             </td>
                             <td>{{ \Carbon\Carbon::parse($enrollment->submission_date)->format('M j, Y g:i A') }}</td>
                             <td>
-                                <a href="{{ route('sendvnin.show', $enrollment->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('users.show', $enrollment->id) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             </td>
@@ -201,7 +184,7 @@
         <div class="modal-content">
             <form method="GET">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="filterModalLabel">Filter Enrollments</h5>
+                    <h5 class="modal-title" id="filterModalLabel">Filter User</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -209,14 +192,14 @@
                         <label for="statusFilter" class="form-label">Status</label>
                         <select class="form-select" id="statusFilter" name="status">
                             <option value="">All Statuses</option>
-                            @foreach(['pending', 'processing', 'resolved', 'rejected', 'query', 'remark'] as $status)
+                            @foreach(['active', 'inacite', 'suspended'] as $status)
                                 <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
                                     {{ ucfirst($status) }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
-                    <input type="hidden" name="search_bvn" value="{{ request('search_bvn') }}">
+                    <input type="hidden" name="search_email" value="{{ request('search_email') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -234,7 +217,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let searchTimer;
-        const searchInput = document.querySelector('input[name="search_bvn"]');
+        const searchInput = document.querySelector('input[name="search_email"]');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimer);

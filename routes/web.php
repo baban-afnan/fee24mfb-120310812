@@ -8,7 +8,7 @@ use App\Http\Controllers\CRMController;
 use App\Http\Controllers\ManualSearchController;
 use App\Http\Controllers\EnrolmentUserController;
 use App\Http\Controllers\SendVninToNibssController;
-
+use App\Http\Controllers\ManageUsersController;
 
 
 
@@ -37,7 +37,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/nin-services', [ServiceController::class, 'nin'])->name('services.nin');
 Route::get('/bvn-services', [ServiceController::class, 'bvn'])->name('services.bvn');
 Route::get('/verification', [ServiceController::class, 'verification'])->name('services.verification');
-Route::get('/vip-services', [ServiceController::class, 'vip'])->name('services.vip');  
+Route::get('/vip-services', [ServiceController::class, 'vip'])->name('services.vip');
+Route::get('/management-services', [ServiceController::class, 'management'])->name('services.management');    
 });
 
 
@@ -80,6 +81,15 @@ Route::get('/send-vnin', [SendVninToNibssController::class, 'index'])->name('sen
 Route::get('/send-vnin/view/{id}', [SendVninToNibssController::class, 'show'])->name('sendvnin.show');
 Route::put('/send-vnin/view/{id}', [SendVninToNibssController::class, 'update'])->name('sendvnin.update');
 });
+
+
+// User management routes
+Route::middleware('auth')->group(function () {
+Route::get('/users', [ManageUsersController::class, 'index'])->name('users.index');
+Route::get('/users/view/{id}', [ManageUsersController::class, 'show'])->name('users.show');
+Route::put('/users/view/{id}', [ManageUsersController::class, 'update'])->name('users.update');
+});
+
 
 
 require __DIR__.'/auth.php';

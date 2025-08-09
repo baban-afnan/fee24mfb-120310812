@@ -99,10 +99,22 @@
             </div>
         </div>
 
-        {{-- Errors --}}
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+       
+         {{-- Errors --}}
+         @if (session('errorMessage'))
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error!</strong> {{ session('errorMessage') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
+      @if (session('successMessage'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong>Success!</strong> {{ session('successMessage') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      @endif
+
 
         {{-- Table --}}
         <div class="table-responsive">
