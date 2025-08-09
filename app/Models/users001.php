@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserScontrol extends Model
+class users001 extends Model
 {
     // Explicit table name
     protected $table = 'users';
@@ -29,10 +29,7 @@ class UserScontrol extends Model
     ];
 
     // Define statusHistory as an Eloquent relationship method
-    public function statusHistory()
-    {
-        return $this->hasMany(StatusHistory::class, 'id');
-    }
+   
       
 
  public function modificationField()

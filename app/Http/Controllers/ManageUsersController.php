@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserScontrol;
+use App\Models\users001;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\VirtualAccount;
@@ -11,14 +11,14 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class ManageUserScontroller extends Controller
+class ManageUsersController extends Controller
 {
     public function index(Request $request)
     {
         $searchemail = $request->input('search_email');
         $statusFilter = $request->input('status');
 
-        $query = UserScontrol::query();
+        $query = users001::query();
 
         if ($searchemail) {
             $query->where('email', 'like', "%$searchemail%");
@@ -31,9 +31,9 @@ class ManageUserScontroller extends Controller
         $enrollments = $query->orderByDesc('created_at')->paginate(10);
 
         $statusCounts = [
-            'inactive' => UserScontrol::where('status', 'inactive')->count(),
-            'suspended' => UserScontrol::where('status', 'suspended')->count(),
-            'active' => UserScontrol::where('status', 'active')->count(),
+            'inactive' => users001::where('status', 'inactive')->count(),
+            'suspended' => users001::where('status', 'suspended')->count(),
+            'active' => users001::where('status', 'active')->count(),
         ];
 
         return view('users', compact('enrollments', 'searchemail', 'statusFilter', 'statusCounts'));
@@ -41,7 +41,7 @@ class ManageUserScontroller extends Controller
 
     public function show($id)
     {
-        $user = UserScontrol::findOrFail($id);
+        $user = users001::findOrFail($id);
         $agent = $user->user_id ? User::find($user->user_id) : null;
         $wallet = Wallet::where('user_id', $id)->first();
         $virtualAccount = VirtualAccount::where('user_id', $id)->first();
@@ -81,7 +81,7 @@ class ManageUserScontroller extends Controller
     DB::beginTransaction();
 
     try {
-        $user = UserScontrol::findOrFail($id);
+        $user = users001::findOrFail($id);
         $updates = [];
         $messageParts = [];
 
@@ -123,7 +123,6 @@ class ManageUserScontroller extends Controller
             : 'No changes were made';
 
         return redirect()->route('users.index')->with('successMessage', $successMessage);
-
     } catch (\Exception $e) {
         DB::rollBack();
         return redirect()->route('users.index')->with('errorMessage', 'Failed to update: ' . $e->getMessage());
