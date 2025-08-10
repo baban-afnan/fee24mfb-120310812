@@ -23,7 +23,7 @@
         </div>
       </li>
       <li class="sidebar-list">
-        <a class="sidebar-link" href="">
+          <a class="sidebar-link sidebar-link-active" href="{{ route('services.wallet') }}">
           <i class="fas fa-wallet fa-lg sidebar-icon"></i>
           <h6 class="sidebar-text f-w-600">Fund Wallet</h6>
         </a>

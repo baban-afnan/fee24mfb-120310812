@@ -17,10 +17,13 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
+   protected $fillable = [
         'name',
         'email',
         'password',
+        'photo',
+        'profile_photo_url',
+        'role', 
     ];
 
     /**
@@ -44,5 +47,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+     public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }

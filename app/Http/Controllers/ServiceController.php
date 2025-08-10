@@ -30,4 +30,9 @@ class ServiceController extends Controller
     {
         return view('management');
     }
+
+     public function wallet()
+    {
+        return view('wallet-services');
+    }
 }

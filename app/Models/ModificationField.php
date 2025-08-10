@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Service;
+use App\Models\ServicePrice;
 
 class ModificationField extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
+        'services_id', 
         'field_name',
         'field_code',
         'description',
@@ -18,9 +20,10 @@ class ModificationField extends Model
         'is_active',
     ];
 
+  
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Service::class, 'services_id');
     }
 
     public function prices()
@@ -36,11 +39,20 @@ class ModificationField extends Model
      */
     public function getPriceForUserType($userType)
     {
-        // Use loaded relationship if available
         $matched = $this->relationLoaded('prices')
             ? $this->prices->firstWhere('user_type', $userType)
             : $this->prices()->where('user_type', $userType)->first();
 
         return $matched?->price ?? $this->base_price;
+    }
+
+    /**
+     * Get field name with related service name
+     *
+     * @return string
+     */
+    public function getFieldWithServiceName()
+    {
+        return $this->field_name . ' (' . ($this->service->name ?? 'No Service') . ')';
     }
 }

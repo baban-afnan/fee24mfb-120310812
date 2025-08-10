@@ -9,6 +9,11 @@ use App\Http\Controllers\ManualSearchController;
 use App\Http\Controllers\EnrolmentUserController;
 use App\Http\Controllers\SendVninToNibssController;
 use App\Http\Controllers\ManageUsersController;
+use App\Http\Controllers\WalletFundingController;
+use App\Http\Controllers\GeneralWalletFundingController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationAdd;
+
 
 
 
@@ -38,7 +43,8 @@ Route::get('/nin-services', [ServiceController::class, 'nin'])->name('services.n
 Route::get('/bvn-services', [ServiceController::class, 'bvn'])->name('services.bvn');
 Route::get('/verification', [ServiceController::class, 'verification'])->name('services.verification');
 Route::get('/vip-services', [ServiceController::class, 'vip'])->name('services.vip');
-Route::get('/management-services', [ServiceController::class, 'management'])->name('services.management');    
+Route::get('/management-services', [ServiceController::class, 'management'])->name('services.management'); 
+Route::get('/wallet-services', [ServiceController::class, 'wallet'])->name('services.wallet');   
 });
 
 
@@ -88,6 +94,31 @@ Route::middleware('auth')->group(function () {
 Route::get('/users', [ManageUsersController::class, 'index'])->name('users.index');
 Route::get('/users/view/{id}', [ManageUsersController::class, 'show'])->name('users.show');
 Route::put('/users/view/{id}', [ManageUsersController::class, 'update'])->name('users.update');
+});
+
+
+// Manual wallet funding
+Route::middleware('auth')->group(function () {
+Route::get('/manual-funding', [WalletFundingController::class, 'showForm'])->name('manual.funding.form');
+Route::post('/manual-funding', [WalletFundingController::class, 'process'])->name('manual.funding');
+});
+
+
+Route::middleware('auth')->group(function () {
+Route::get('/general-funding', [GeneralWalletFundingController::class, 'showForm'])->name('general.funding.form');
+Route::post('/general-funding', [GeneralWalletFundingController::class, 'process'])->name('general.funding');
+Route::post('/general-funding/preview', [GeneralWalletFundingController::class, 'preview'])->name('general-funding.preview');
+Route::post('/general-funding/queue', [GeneralWalletFundingController::class, 'queue'])->name('general-funding.queue');
+});
+
+
+
+// NOTIFICATIONS UPDATES
+Route::middleware('auth')->group(function () {
+Route::get('/notification', [NotificationController::class, 'index'])->name('notification.index');
+Route::get('/notification/view/{id}', [NotificationController::class, 'show'])->name('notification.show');
+Route::put('/notification/view/{id}', [NotificationController::class, 'update'])->name('notification.update');
+Route::post('/notifications', [NotificationAdd::class, 'store'])->name('notification.store');
 });
 
 

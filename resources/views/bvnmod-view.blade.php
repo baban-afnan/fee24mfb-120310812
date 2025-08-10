@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-slot name="title">BVN - Modification</x-slot>
 
-    {{-- Main Content --}}
     <main class="main-content">
         <div class="container-fluid">
 
@@ -9,25 +8,25 @@
             @if (session('errorMessage'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong>Error!</strong> {{ session('errorMessage') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
             @if (session('successMessage'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <strong>Success!</strong> {{ session('successMessage') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
             <div class="row">
 
-                {{-- Left Column: Enrollment Info & Update Form --}}
+                {{-- Left Column --}}
                 <div class="col-lg-8">
 
-                    {{-- Enrollment Information --}}
+                    {{-- Enrollment Info --}}
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h6 class="m-0 font-weight-bold text-primary">Enrollment Information</h6>
                         </div>
                         <div class="card-body">
@@ -39,7 +38,8 @@
                                             <td>
                                                 {{ $enrollmentInfo->user_id }}
                                                 @if (!empty($user))
-                                                    <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
+                                                    <button type="button" class="btn btn-sm btn-outline-info ms-2"
+                                                        data-bs-toggle="modal" data-bs-target="#agentInfoModal">
                                                         View Agent Info
                                                     </button>
                                                 @endif
@@ -54,14 +54,26 @@
                                             <td>
                                                 {{ $enrollmentInfo->affidavit }}
                                                 @if (!empty($enrollmentInfo->affidavit_file_url))
-                                                    <a href="{{ $enrollmentInfo->affidavit_file_url }}" target="_blank" class="btn btn-sm btn-outline-secondary ms-2">
+                                                    <a href="{{ $enrollmentInfo->affidavit_file_url }}" target="_blank"
+                                                       class="btn btn-sm btn-outline-secondary ms-2">
                                                         Open File
                                                     </a>
                                                 @endif
                                             </td>
                                         </tr>
                                         <tr><th>New Information</th><td>{{ $enrollmentInfo->description }}</td></tr>
-                                        <tr><th>Modification Field</th><td>{{ $enrollmentInfo->modification_field_id }}</td></tr>
+
+                                        {{-- Modification Field + Service Name --}}
+                                        <tr>
+                                            <th>Modification Field</th>
+                                            <td>
+                                                {{ $enrollmentInfo->field_name }}
+                                                @if(!empty($serviceName))
+                                                    <span class="text-muted">({{ $serviceName }})</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+
                                         <tr>
                                             <th>Current Status</th>
                                             <td>
@@ -69,7 +81,7 @@
                                                     $enrollmentInfo->status === 'pending' ? 'info' : 
                                                     ($enrollmentInfo->status === 'processing' ? 'primary' : 
                                                     ($enrollmentInfo->status === 'resolved' ? 'success' : 
-                                                    ($enrollmentInfo->status === 'rejected' ? 'danger' : 'secondary')))
+                                                    ($enrollmentInfo->status === 'rejected' ? 'danger' : 'secondary'))) 
                                                 }}">
                                                     {{ ucfirst($enrollmentInfo->status) }}
                                                 </span>
@@ -78,7 +90,11 @@
                                         <tr><th>Comment</th><td>{{ $enrollmentInfo->comment ?? 'N/A' }}</td></tr>
                                         <tr>
                                             <th>Date Created</th>
-                                            <td>{{ $enrollmentInfo->submission_date ? \Carbon\Carbon::parse($enrollmentInfo->submission_date)->format('M j, Y g:i A') : 'N/A' }}</td>
+                                            <td>
+                                                {{ $enrollmentInfo->submission_date 
+                                                    ? \Carbon\Carbon::parse($enrollmentInfo->submission_date)->format('M j, Y g:i A') 
+                                                    : 'N/A' }}
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -88,7 +104,7 @@
 
                     {{-- Update Status Form --}}
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
+                        <div class="card-header">
                             <h6 class="m-0 font-weight-bold text-primary">Update Status</h6>
                         </div>
                         <div class="card-body">
@@ -127,10 +143,10 @@
                     </div>
                 </div>
 
-                {{-- Right Column: Status History --}}
+                {{-- Right Column --}}
                 <div class="col-lg-4">
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
+                        <div class="card-header">
                             <h6 class="m-0 font-weight-bold text-primary">Status History</h6>
                         </div>
                         <div class="card-body">
@@ -142,7 +158,7 @@
                                                 $history['status'] === 'pending' ? 'warning' :
                                                 ($history['status'] === 'processing' ? 'primary' :
                                                 ($history['status'] === 'resolved' ? 'success' :
-                                                ($history['status'] === 'rejected' ? 'danger' : 'secondary')))
+                                                ($history['status'] === 'rejected' ? 'danger' : 'secondary'))) 
                                             }} shadow-sm">
                                                 <div class="card-body p-3">
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -153,7 +169,7 @@
                                                             $history['status'] === 'pending' ? 'warning' :
                                                             ($history['status'] === 'processing' ? 'info' :
                                                             ($history['status'] === 'resolved' ? 'success' :
-                                                            ($history['status'] === 'rejected' ? 'danger' : 'secondary')))
+                                                            ($history['status'] === 'rejected' ? 'danger' : 'secondary'))) 
                                                         }}">
                                                             {{ ucfirst($history['status']) }}
                                                         </span>
@@ -180,27 +196,9 @@
                     </div>
                 </div>
 
-            </div> {{-- End row --}}
-        </div> {{-- End container --}}
+            </div>
+        </div>
     </main>
 
-   @include ('modal.user')
-    {{-- Scripts --}}
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let searchTimer;
-            const searchInput = document.querySelector('input[name="search_bvn"]');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimer);
-                    searchTimer = setTimeout(() => {
-                        this.closest('form').submit();
-                    }, 800);
-                });
-            }
-        });
-    </script>
-    @endpush
-
+    @include('modal.user')
 </x-app-layout>
