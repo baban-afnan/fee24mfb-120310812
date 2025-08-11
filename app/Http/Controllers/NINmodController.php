@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\BVNmodification;
+use App\Models\Ninmodification;
 use App\Models\User;
 use App\Models\ModificationField;
 use App\Models\Transaction;
@@ -12,17 +12,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class BVNmodController extends Controller
+class NINmodController extends Controller
 {
     public function index(Request $request)
     {
-        $searchbvn = $request->input('search_bvn');
+        $searchnin = $request->input('search_nin');
         $statusFilter = $request->input('status');
 
-        $query = BVNmodification::query();
+        $query = Ninmodification::query();
 
-        if ($searchbvn) {
-            $query->where('bvn', 'like', "%$searchbvn%");
+        if ($searchnin) {
+            $query->where('nin', 'like', "%$searchnin%");
         }
 
         if ($statusFilter) {
@@ -32,18 +32,19 @@ class BVNmodController extends Controller
         $enrollments = $query->orderByDesc('submission_date')->paginate(15);
 
         $statusCounts = [
-            'pending' => BVNmodification::where('status', 'pending')->count(),
-            'processing' => BVNmodification::where('status', 'processing')->count(),
-            'resolved' => BVNmodification::where('status', 'resolved')->count(),
-            'rejected' => BVNmodification::where('status', 'rejected')->count(),
+            'pending' => Ninmodification::where('status', 'pending')->count(),
+            'processing' => Ninmodification::where('status', 'processing')->count(),
+            'resolved' => Ninmodification::where('status', 'resolved')->count(),
+            'rejected' => Ninmodification::where('status', 'rejected')->count(),
+            
         ];
 
-        return view('bvnmod', compact('enrollments', 'searchbvn', 'statusFilter', 'statusCounts'));
+        return view('ninmod', compact('enrollments', 'searchnin', 'statusFilter', 'statusCounts'));
     }
 
     public function show($id)
     {
-        $enrollmentInfo = BVNmodification::findOrFail($id);
+        $enrollmentInfo = Ninmodification::findOrFail($id);
         $user = User::find($enrollmentInfo->user_id);
 
         $statusHistory = collect([
@@ -55,10 +56,10 @@ class BVNmodController extends Controller
             ]
         ]);
 
-        return view('bvnmod-view', compact('enrollmentInfo', 'statusHistory', 'user'));
+        return view('ninmod-view', compact('enrollmentInfo', 'statusHistory', 'user'));
     }
 
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
     $request->validate([
         'status' => 'required|in:pending,processing,resolved,rejected',
@@ -68,7 +69,7 @@ class BVNmodController extends Controller
     DB::beginTransaction();
 
     try {
-        $enrollment = BVNmodification::findOrFail($id);
+        $enrollment = Ninmodification::findOrFail($id);
         $oldStatus = $enrollment->status;
 
         $enrollment->status = $request->status;
@@ -152,10 +153,10 @@ class BVNmodController extends Controller
         }
 
         DB::commit();
-        return redirect()->route('bvnmod.index')->with('successMessage', 'Status updated successfully.');
+        return redirect()->route('ninmod.index')->with('successMessage', 'Status updated successfully.');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('bvnmod.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
+        return redirect()->route('ninmod.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
     }
 }
 

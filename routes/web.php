@@ -13,6 +13,9 @@ use App\Http\Controllers\WalletFundingController;
 use App\Http\Controllers\GeneralWalletFundingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationAdd;
+use App\Http\Controllers\ValidationController;
+use App\Http\Controllers\IpeController;
+use App\Http\Controllers\NINmodController;
 
 
 
@@ -54,6 +57,14 @@ Route::middleware('auth')->group(function () {
 Route::get('/bvnmod', [BVNmodController::class, 'index'])->name('bvnmod.index');
 Route::get('/bvnmod/view/{id}', [BVNmodController::class, 'show'])->name('bvnmod.show');
 Route::put('/bvnmod/view/{id}', [BVNmodController::class, 'update'])->name('bvnmod.update');
+});
+
+
+// BVN Modification Routes
+Route::middleware('auth')->group(function () {
+Route::get('/ninmod', [NINmodController::class, 'index'])->name('ninmod.index');
+Route::get('/ninmod/view/{id}', [NINmodController::class, 'show'])->name('ninmod.show');
+Route::put('/ninmod/view/{id}', [NINmodController::class, 'update'])->name('ninmod.update');
 });
 
 
@@ -121,6 +132,21 @@ Route::put('/notification/view/{id}', [NotificationController::class, 'update'])
 Route::post('/notifications', [NotificationAdd::class, 'store'])->name('notification.store');
 });
 
+
+// BVN Serach Using Phone Number Routes
+Route::middleware('auth')->group(function () {
+Route::get('/validation', [ValidationController::class, 'index'])->name('validation.index');
+Route::get('/validation/view/{id}', [ValidationController::class, 'show'])->name('validation.show');
+Route::put('/validation/view/{id}', [ValidationController::class, 'update'])->name('validation.update');
+});
+
+
+// BVN Serach Using Phone Number Routes
+Route::middleware('auth')->group(function () {
+Route::get('/ipe', [IpeController::class, 'index'])->name('ipe.index');
+Route::get('/ipe/view/{id}', [IpeController::class, 'show'])->name('ipe.show');
+Route::put('/ipe/view/{id}', [IpeController::class, 'update'])->name('ipe.update');
+});
 
 
 require __DIR__.'/auth.php';

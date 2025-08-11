@@ -62,18 +62,8 @@
                                             </td>
                                         </tr>
                                         <tr><th>New Information</th><td>{{ $enrollmentInfo->description }}</td></tr>
-
-                                        {{-- Modification Field + Service Name --}}
-                                        <tr>
-                                            <th>Modification Field</th>
-                                            <td>
-                                                {{ $enrollmentInfo->field_name }}
-                                                @if(!empty($serviceName))
-                                                    <span class="text-muted">({{ $serviceName }})</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-
+                                        <tr><th>Enrolment Bank</th><td>{{ $enrollmentInfo->service_name }}</td></tr>
+                                        <tr><th>Modification Field</th><td>{{ $enrollmentInfo->modification_field_name }}</td></tr> 
                                         <tr>
                                             <th>Current Status</th>
                                             <td>

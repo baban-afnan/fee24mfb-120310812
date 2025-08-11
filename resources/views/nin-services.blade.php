@@ -14,19 +14,19 @@
                   <div class="card-body">
                     <div class="row icon-lists"> 
                       <div class="col-10 col-xxl-2 col-lg-4 col-md-6 icons-item">
-                        <a class="sidebar-link sidebar-link-active" href="">
+                        <a class="sidebar-link sidebar-link-active" href="{{route('ninmod.index')}}">
                           <img src="../assets/images/apps/nimc1.png" alt="Arrow Up Service" class="mb-2" style="width:40px;height:40px;object-fit:contain;">
                           <h5 class="mt-0">NIN Modification</h5>
                         </a>
                       </div>
                       <div class="col-10 col-xxl-2 col-lg-4 col-md-6 icons-item">
-                         <a class="sidebar-link sidebar-link-active" href="">
+                         <a class="sidebar-link sidebar-link-active" href="{{route ("validation.index")}}">
                           <img src="../assets/images/apps/nimc1.png" alt="Arrow Up Service" class="mb-2" style="width:40px;height:40px;object-fit:contain;">
                           <h5 class="mt-0">Validations</h5>
                         </a>
                       </div>
                       <div class="col-10 col-xxl-2 col-lg-4 col-md-6 icons-item">
-                         <a class="sidebar-link sidebar-link-active" href="">
+                         <a class="sidebar-link sidebar-link-active" href="{{route("ipe.index")}}">
                           <img src="../assets/images/apps/nimc1.png" alt="Arrow Up Service" class="mb-2" style="width:40px;height:40px;object-fit:contain;">
                           <h5 class="mt-0">IPE</h5>
                         </a>

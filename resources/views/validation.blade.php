@@ -1,5 +1,5 @@
 <x-app-layout>
- <x-slot name="title">BVN - Modification </x-slot>
+<x-slot name="title">NIN Validation  Control Form</x-slot>
 
 <div class="row g-4 mb-4">
 
@@ -49,9 +49,11 @@
 </div>
 
 
+
+
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">BVN Modification Request</h6>
+        <h6 class="m-0 font-weight-bold text-primary">NIN Validation Request</h6>
         <div class="dropdown no-arrow">
             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical text-gray-400"></i>
@@ -72,7 +74,7 @@
             <div class="col-md-6">
                 <form method="GET" class="form-inline search-full col">
                     <div class="input-group">
-                        <input type="text" name="search_bvn" class="form-control" placeholder="Search by BVN..." value="{{ request('search_bvn') }}">
+                        <input type="text" name="search_nin" class="form-control" placeholder="Search by nin..." value="{{ request('search_nin') }}">
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -88,8 +90,8 @@
                         {{ request('status') ? 'Filter: ' . ucfirst(request('status')) : 'Filters' }}
                     </button>
 
-                    @if(request('status') || request('search_bvn'))
-                        <a href="{{ route('bvnmod.index') }}" class="btn btn-outline-danger">
+                    @if(request('status') || request('search_nin'))
+                        <a href="{{ route('sendvnin.index') }}" class="btn btn-outline-danger">
                             <i class="bi bi-x-circle"></i> Clear
                         </a>
                     @endif
@@ -98,21 +100,9 @@
         </div>
 
         {{-- Errors --}}
-         {{-- Errors --}}
-         @if (session('errorMessage'))
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Error!</strong> {{ session('errorMessage') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      @endif
-
-      @if (session('successMessage'))
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <strong>Success!</strong> {{ session('successMessage') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      @endif
-
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
         {{-- Table --}}
         <div class="table-responsive">
@@ -120,10 +110,8 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>BVN</th>
+                        <th>Reference</th>
                         <th>NIN</th>
-                        <th>BANK</th>
-                        <th>MODIFICATION FIELD</th>
                         <th>Status</th>
                         <th>Date Created</th>
                         <th>Actions</th>
@@ -133,12 +121,10 @@
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>
-                            <td>{{ $enrollment->bvn }}</td>
+                            <td>{{ $enrollment->reference }}</td>
                             <td>{{ $enrollment->nin }}</td>
-                            <td>{{ $enrollment->service_name }}</td>
-                            <td>{{ $enrollment->modification_field_name }}</td>
                             <td>
-                               @php
+                                @php
                                     $statusColor = match($enrollment->status) {
                                         'pending' => 'warning',
                                         'processing' => 'info',
@@ -153,7 +139,7 @@
                             </td>
                             <td>{{ \Carbon\Carbon::parse($enrollment->submission_date)->format('M j, Y g:i A') }}</td>
                             <td>
-                                <a href="{{ route('bvnmod.show', $enrollment->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('validation.show', $enrollment->id) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> View
                                 </a>
                             </td>
@@ -213,7 +199,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <input type="hidden" name="search_bvn" value="{{ request('search_bvn') }}">
+                    <input type="hidden" name="search_nin" value="{{ request('search_nin') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -231,7 +217,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let searchTimer;
-        const searchInput = document.querySelector('input[name="search_bvn"]');
+        const searchInput = document.querySelector('input[name="search_nin"]');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimer);

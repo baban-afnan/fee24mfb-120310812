@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\BVNmodification;
+use App\Models\ipe;
 use App\Models\User;
 use App\Models\ModificationField;
 use App\Models\Transaction;
@@ -12,38 +12,38 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class BVNmodController extends Controller
+class IpeController extends Controller
 {
     public function index(Request $request)
     {
-        $searchbvn = $request->input('search_bvn');
+        $searchbatch_id = $request->input('search_batch_id');
         $statusFilter = $request->input('status');
 
-        $query = BVNmodification::query();
+        $query = ipe::query();
 
-        if ($searchbvn) {
-            $query->where('bvn', 'like', "%$searchbvn%");
+        if ($searchbatch_id) {
+            $query->where('batch_id', 'like', "%$searchbatch_id%");
         }
 
         if ($statusFilter) {
             $query->where('status', $statusFilter);
         }
 
-        $enrollments = $query->orderByDesc('submission_date')->paginate(15);
+        $enrollments = $query->orderByDesc('submission_date')->paginate(10);
 
         $statusCounts = [
-            'pending' => BVNmodification::where('status', 'pending')->count(),
-            'processing' => BVNmodification::where('status', 'processing')->count(),
-            'resolved' => BVNmodification::where('status', 'resolved')->count(),
-            'rejected' => BVNmodification::where('status', 'rejected')->count(),
+            'pending' => ipe::where('status', 'pending')->count(),
+            'processing' => ipe::where('status', 'processing')->count(),
+            'resolved' => ipe::where('status', 'resolved')->count(),
+            'rejected' => ipe::where('status', 'rejected')->count(),
         ];
 
-        return view('bvnmod', compact('enrollments', 'searchbvn', 'statusFilter', 'statusCounts'));
+        return view('ipe', compact('enrollments', 'searchbatch_id', 'statusFilter', 'statusCounts'));
     }
 
     public function show($id)
     {
-        $enrollmentInfo = BVNmodification::findOrFail($id);
+        $enrollmentInfo = ipe::findOrFail($id);
         $user = User::find($enrollmentInfo->user_id);
 
         $statusHistory = collect([
@@ -55,10 +55,10 @@ class BVNmodController extends Controller
             ]
         ]);
 
-        return view('bvnmod-view', compact('enrollmentInfo', 'statusHistory', 'user'));
+        return view('ipe-view', compact('enrollmentInfo', 'statusHistory', 'user'));
     }
 
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
     $request->validate([
         'status' => 'required|in:pending,processing,resolved,rejected',
@@ -68,7 +68,7 @@ class BVNmodController extends Controller
     DB::beginTransaction();
 
     try {
-        $enrollment = BVNmodification::findOrFail($id);
+        $enrollment = ipe::findOrFail($id);
         $oldStatus = $enrollment->status;
 
         $enrollment->status = $request->status;
@@ -152,10 +152,10 @@ class BVNmodController extends Controller
         }
 
         DB::commit();
-        return redirect()->route('bvnmod.index')->with('successMessage', 'Status updated successfully.');
+        return redirect()->route('ipe.index')->with('successMessage', 'Status updated successfully.');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('bvnmod.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
+        return redirect()->route('ipe.index')->with('errorMessage', 'Failed to update status: ' . $e->getMessage());
     }
 }
 
