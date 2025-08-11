@@ -110,6 +110,7 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
+                        <th>Reference</th>
                         <th>Field</th>
                         <th>NIN</th>
                         <th>Status</th>
@@ -121,7 +122,8 @@
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>
-                            <td>{{ $enrollment->modifcation_field_name }}</td>
+                            <td>{{ $enrollment->reference }}</td>
+                            <td>{{ $enrollment->modification_field_name }}</td>
                             <td>{{ $enrollment->nin }}</td>
                             <td>
                                 @php
