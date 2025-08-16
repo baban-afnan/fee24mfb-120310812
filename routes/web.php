@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationAdd;
 use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\IpeController;
 use App\Http\Controllers\NINmodController;
+use App\Http\Controllers\EnrollmentController;
 
 
 
@@ -138,6 +139,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/validation', [ValidationController::class, 'index'])->name('validation.index');
 Route::get('/validation/view/{id}', [ValidationController::class, 'show'])->name('validation.show');
 Route::put('/validation/view/{id}', [ValidationController::class, 'update'])->name('validation.update');
+});
+
+
+Route::prefix('enrollments')->group(function () {
+    Route::get('/', [EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::post('/upload', [EnrollmentController::class, 'upload'])->name('enrollments.upload');
 });
 
 

@@ -68,7 +68,7 @@
                                     <label class="col-form-label">Password</label>
                                     <div class="input-group position-relative">
                                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                        <input class="form-control" type="password" name="password" required placeholder="********" maxlength="8" minlength="8">
+                                        <input class="form-control" type="password" name="password" required placeholder="********">
                                     </div>
                                     @error('password')
                                         <small class="text-danger">{{ $message }}</small>
