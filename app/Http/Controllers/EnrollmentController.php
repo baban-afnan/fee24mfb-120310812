@@ -42,7 +42,7 @@ class EnrollmentController extends Controller
     }
 
     /**
-     * Upload & process Excel/CSV
+     * Upload & process Excel/CSV with strict status update rules
      */
     public function upload(Request $request)
     {
@@ -56,42 +56,85 @@ class EnrollmentController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
             $rows = $sheet->toArray(null, true, true, true);
 
-            DB::transaction(function () use ($rows) {
+            // Counters
+            $created = 0;
+            $updated = 0;
+            $skippedDuplicates = 0;
+            $skippedEmpty = 0;
+            $processedTickets = [];
+
+            DB::transaction(function () use ($rows, &$created, &$updated, &$skippedDuplicates, &$skippedEmpty, &$processedTickets) {
                 foreach ($rows as $index => $row) {
                     if ($index === 1) continue; // Skip header row
 
-                    $ticket = trim($row['A']);
-                    if (!$ticket) continue; // Ticket is required
+                    $ticket = isset($row['A']) ? trim($row['A']) : null;
+                    
+                    // Skip if ticket number is empty
+                    if (empty($ticket)) {
+                        $skippedEmpty++;
+                        continue;
+                    }
 
-                    Enrollment::updateOrCreate(
-                        ['TICKET_NUMBER' => $ticket],
-                        [
-                            'id'                   => Enrollment::nextId(), // only used if new row
-                            'BVN'                  => $row['B'] ?? null,
-                            'AGT_MGT_INST_NAME'    => $row['C'] ?? null,
-                            'AGT_MGT_INST_CODE'    => $row['D'] ?? null,
-                            'AGENT_NAME'           => $row['E'] ?? null,
-                            'AGENT_CODE'           => $row['F'] ?? null,
-                            'ENROLLER_CODE'        => $row['G'] ?? null,
-                            'LATITUDE'             => $row['H'] ?? null,
-                            'LONGITUDE'            => $row['I'] ?? null,
-                            'FINGER_PRINT_SCANNER' => $row['J'] ?? null,
-                            'BMS_IMPORT_ID'        => $row['K'] ?? null,
-                            'validation_status'    => $row['L'] ?? 'pending',
-                            'VALIDATION_MESSAGE'   => $row['M'] ?? null,
-                            'AMOUNT'               => isset($row['N']) ? (float)$row['N'] : null,
-                            'CAPTURE_DATE'         => $row['O'] ?? null,
-                            'SYNC_DATE'            => $row['P'] ?? null,
-                            'VALIDATION_DATE'      => $row['Q'] ?? null,
-                            'AGENT_STATE'          => $row['R'] ?? null,
-                        ]
-                    );
+                    // Skip if ticket is duplicated in the current file
+                    if (isset($processedTickets[$ticket])) {
+                        $skippedDuplicates++;
+                        continue;
+                    }
+                    $processedTickets[$ticket] = true;
+
+                    // Prepare all fields including status
+                    $updateData = [
+                        'BVN'                  => $row['B'] ?? null,
+                        'AGT_MGT_INST_NAME'    => $row['C'] ?? null,
+                        'AGT_MGT_INST_CODE'    => $row['D'] ?? null,
+                        'AGENT_NAME'           => $row['E'] ?? null,
+                        'AGENT_CODE'           => $row['F'] ?? null,
+                        'ENROLLER_CODE'        => $row['G'] ?? null,
+                        'LATITUDE'             => $row['H'] ?? null,
+                        'LONGITUDE'            => $row['I'] ?? null,
+                        'FINGER_PRINT_SCANNER' => $row['J'] ?? null,
+                        'BMS_IMPORT_ID'        => $row['K'] ?? null,
+                        'validation_status'    => $row['L'] ?? 'pending',
+                        'VALIDATION_MESSAGE'   => $row['M'] ?? null,
+                        'AMOUNT'               => isset($row['N']) ? (float)$row['N'] : null,
+                        'CAPTURE_DATE'         => $row['O'] ?? null,
+                        'SYNC_DATE'            => $row['P'] ?? null,
+                        'VALIDATION_DATE'      => $row['Q'] ?? null,
+                        'AGENT_STATE'          => $row['R'] ?? null,
+                    ];
+
+                    // Check if ticket exists
+                    $existing = Enrollment::where('TICKET_NUMBER', $ticket)->first();
+
+                    if ($existing) {
+                        // Update ALL fields including status
+                        $existing->update($updateData);
+                        $updated++;
+                    } else {
+                        // Create new record
+                        Enrollment::create(array_merge(['TICKET_NUMBER' => $ticket], $updateData));
+                        $created++;
+                    }
                 }
             });
 
-            return back()->with('success', 'File uploaded and processed successfully.');
+            $message = sprintf(
+                "Process completed: %d created, %d updated",
+                $created,
+                $updated
+            );
+
+            if ($skippedDuplicates > 0 || $skippedEmpty > 0) {
+                $message .= sprintf(
+                    " | Skipped: %d duplicate tickets, %d empty tickets",
+                    $skippedDuplicates,
+                    $skippedEmpty
+                );
+            }
+
+            return back()->with('success', $message);
         } catch (\Exception $e) {
-            return back()->with('error', 'Upload failed: ' . $e->getMessage());
+            return back()->with('error', 'Processing failed: ' . $e->getMessage());
         }
     }
 }
