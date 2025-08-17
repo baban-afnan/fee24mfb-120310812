@@ -9,6 +9,15 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class EnrollmentController extends Controller
 {
+    // Define allowed statuses as a constant
+    const ALLOWED_STATUSES = [
+        'pending',
+        'ongoing',
+        'failed',
+        'rejected',
+        'successful'
+    ];
+
     /**
      * Show enrollment list with search and status
      */
@@ -42,7 +51,7 @@ class EnrollmentController extends Controller
     }
 
     /**
-     * Upload & process Excel/CSV with strict status update rules
+     * Upload & process Excel/CSV with strict status validation
      */
     public function upload(Request $request)
     {
@@ -61,9 +70,10 @@ class EnrollmentController extends Controller
             $updated = 0;
             $skippedDuplicates = 0;
             $skippedEmpty = 0;
+            $invalidStatus = 0;
             $processedTickets = [];
 
-            DB::transaction(function () use ($rows, &$created, &$updated, &$skippedDuplicates, &$skippedEmpty, &$processedTickets) {
+            DB::transaction(function () use ($rows, &$created, &$updated, &$skippedDuplicates, &$skippedEmpty, &$invalidStatus, &$processedTickets) {
                 foreach ($rows as $index => $row) {
                     if ($index === 1) continue; // Skip header row
 
@@ -82,7 +92,14 @@ class EnrollmentController extends Controller
                     }
                     $processedTickets[$ticket] = true;
 
-                    // Prepare all fields including status
+                    // Validate and set status
+                    $status = strtolower(trim($row['L'] ?? 'pending'));
+                    if (!in_array($status, self::ALLOWED_STATUSES)) {
+                        $status = 'pending';
+                        $invalidStatus++;
+                    }
+
+                    // Prepare all fields with validated status
                     $updateData = [
                         'BVN'                  => $row['B'] ?? null,
                         'AGT_MGT_INST_NAME'    => $row['C'] ?? null,
@@ -94,7 +111,7 @@ class EnrollmentController extends Controller
                         'LONGITUDE'            => $row['I'] ?? null,
                         'FINGER_PRINT_SCANNER' => $row['J'] ?? null,
                         'BMS_IMPORT_ID'        => $row['K'] ?? null,
-                        'validation_status'    => $row['L'] ?? 'pending',
+                        'validation_status'    => $status, // Validated status
                         'VALIDATION_MESSAGE'   => $row['M'] ?? null,
                         'AMOUNT'               => isset($row['N']) ? (float)$row['N'] : null,
                         'CAPTURE_DATE'         => $row['O'] ?? null,
@@ -124,12 +141,20 @@ class EnrollmentController extends Controller
                 $updated
             );
 
-            if ($skippedDuplicates > 0 || $skippedEmpty > 0) {
-                $message .= sprintf(
-                    " | Skipped: %d duplicate tickets, %d empty tickets",
-                    $skippedDuplicates,
-                    $skippedEmpty
-                );
+            // Add warnings if needed
+            $warnings = [];
+            if ($skippedDuplicates > 0) {
+                $warnings[] = "{$skippedDuplicates} duplicate tickets skipped";
+            }
+            if ($skippedEmpty > 0) {
+                $warnings[] = "{$skippedEmpty} empty tickets skipped";
+            }
+            if ($invalidStatus > 0) {
+                $warnings[] = "{$invalidStatus} invalid statuses defaulted to 'pending'";
+            }
+
+            if (!empty($warnings)) {
+                $message .= " | " . implode(', ', $warnings);
             }
 
             return back()->with('success', $message);
