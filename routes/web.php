@@ -142,11 +142,10 @@ Route::put('/validation/view/{id}', [ValidationController::class, 'update'])->na
 });
 
 
-Route::prefix('enrollments')->group(function () {
-    Route::get('/', [EnrollmentController::class, 'index'])->name('enrollments.index');
-    Route::post('/upload', [EnrollmentController::class, 'upload'])->name('enrollments.upload');
-});
-
+Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+Route::post('/enrollments/upload', [EnrollmentController::class, 'upload'])->name('enrollments.upload');
+Route::put('/enrollments/{enrollment}/update-status', [EnrollmentController::class, 'updateStatus'])->name('enrollments.update-status');
+Route::get('/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
 
 // BVN Serach Using Phone Number Routes
 Route::middleware('auth')->group(function () {

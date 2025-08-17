@@ -27,6 +27,7 @@ class Enrollment extends Model
         'CAPTURE_DATE',
         'SYNC_DATE',
         'VALIDATION_DATE',
+        'AGENT_STATE',
     ];
 
     protected $primaryKey = 'id';
