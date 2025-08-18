@@ -17,6 +17,7 @@ use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\IpeController;
 use App\Http\Controllers\NINmodController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\EmailController;
 
 
 
@@ -152,6 +153,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/ipe', [IpeController::class, 'index'])->name('ipe.index');
 Route::get('/ipe/view/{id}', [IpeController::class, 'show'])->name('ipe.show');
 Route::put('/ipe/view/{id}', [IpeController::class, 'update'])->name('ipe.update');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/send-email', [EmailController::class, 'create'])->name('admin.email.create');
+    Route::post('/admin/send-email', [EmailController::class, 'send'])->name('admin.email.send');
 });
 
 

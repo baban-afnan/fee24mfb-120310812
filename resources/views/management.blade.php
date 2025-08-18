@@ -62,7 +62,7 @@
 
                             <!-- Email -->
                             <div class="col-10 col-xxl-2 col-lg-4 col-md-6 icons-item">
-                                <a href="#">
+                                <a href="{{route('admin.email.create')}}">
                                     <img src="{{ asset('assets/images/apps/email.png') }}" 
                                          alt="Email" 
                                          class="mb-2" 
