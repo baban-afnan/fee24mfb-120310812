@@ -1,14 +1,5 @@
 @extends('layouts.app')
-  <x-slot name="title">EVN ENROLMENT</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
+ <x-slot name="title">BVN - Enrolment </x-slot>
 
 @section('content')
 <div class="container-fluid">
@@ -189,13 +180,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                 @php
-                            // Custom order: pending → processing → query → resolved → rejected → remark
-                            $statusOrder = ['pending' => 1, 'processing' => 2, 'query' => 3, 'resolved' => 4, 'rejected' => 5, 'remark' => 6];
-                            $sortedSubmissions = $crmSubmissions->sortBy(function ($item) use ($statusOrder) {
-                                return $statusOrder[$item->status] ?? 999;
-                            });
-                               @endphp
                                 @forelse($data as $enrollment)
                                 <tr>
                                     <td>{{ $enrollment->ticket_number }}</td>
