@@ -1,5 +1,14 @@
 <x-app-layout>
 <x-slot name="title">BVN Enrolment User Control Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 <div class="row g-4 mb-4">
 
@@ -131,6 +140,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>

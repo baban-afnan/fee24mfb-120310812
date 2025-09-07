@@ -1,5 +1,14 @@
 <x-app-layout>
 <x-slot name="title">BVN Search Control Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 <div class="row g-4 mb-4">
 

@@ -1,8 +1,16 @@
 <x-app-layout>
-<x-slot name="title">NIN Validation  Control Form</x-slot>
+  <x-slot name="title">Validation Request Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div class="row g-4 mb-4">
-
+    <div class="row g-4 mb-4">
     <div class="col-md-3">
         <div class="card text-white bg-primary h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">

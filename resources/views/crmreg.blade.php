@@ -1,5 +1,14 @@
 <x-app-layout>
-<x-slot name="title">BVN CRM Control Form</x-slot>
+  <x-slot name="title">BVN CRM Request Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 <div class="row g-4 mb-4">
 
@@ -74,7 +83,7 @@
             <div class="col-md-6">
                 <form method="GET" class="form-inline search-full col">
                     <div class="input-group">
-                        <input type="text" name="search_batch_id" class="form-control" placeholder="Search by batch_id..." value="{{ request('search_batch_id') }}">
+                        <input type="text" name="search_ticket_id" class="form-control" placeholder="Search by ticket_id..." value="{{ request('search_ticket_id') }}">
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -90,7 +99,7 @@
                         {{ request('status') ? 'Filter: ' . ucfirst(request('status')) : 'Filters' }}
                     </button>
 
-                    @if(request('status') || request('search_batch_id'))
+                    @if(request('status') || request('search_ticket_id'))
                         <a href="{{ route('sendvnin.index') }}" class="btn btn-outline-danger">
                             <i class="bi bi-x-circle"></i> Clear
                         </a>
@@ -131,6 +140,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                       
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>
@@ -213,7 +223,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <input type="hidden" name="search_batch_id" value="{{ request('search_batch_id') }}">
+                    <input type="hidden" name="search_ticket_id" value="{{ request('search_ticket_id') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -231,7 +241,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let searchTimer;
-        const searchInput = document.querySelector('input[name="search_batch_id"]');
+        const searchInput = document.querySelector('input[name="search_ticket_id"]');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimer);

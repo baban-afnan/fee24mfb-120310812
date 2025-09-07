@@ -1,5 +1,14 @@
 <x-app-layout>
  <x-slot name="title">BVN - Modification </x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 <div class="row g-4 mb-4">
 
@@ -121,7 +130,7 @@
                     <tr>
                         <th>ID</th>
                         <th>BVN</th>
-                        <th>NIN</th>
+                        <th>Agent Name</th>
                         <th>BANK</th>
                         <th>MODIFICATION FIELD</th>
                         <th>Status</th>
@@ -130,11 +139,12 @@
                     </tr>
                 </thead>
                 <tbody>
+                  
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>
                             <td>{{ $enrollment->bvn }}</td>
-                            <td>{{ $enrollment->nin }}</td>
+                            <td>{{ $enrollment->performed_by }}</td>
                             <td>{{ $enrollment->service_name }}</td>
                             <td>{{ $enrollment->modification_field_name }}</td>
                             <td>

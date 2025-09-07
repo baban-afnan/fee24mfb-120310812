@@ -1,5 +1,14 @@
 <x-app-layout>
- <x-slot name="title">BVN - Services</x-slot>
+   <x-slot name="title">BVN Services </x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 
 <!-- Container-fluid starts-->

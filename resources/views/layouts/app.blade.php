@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Fee24mfb - {{ $title ?? 'Dashboard' }}</title>
+    <title>BiyaNow - {{ $title ?? 'Dashboard' }}</title>
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="Admiro admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities." />

@@ -29,7 +29,16 @@ class IpeController extends Controller
             $query->where('status', $statusFilter);
         }
 
-        $enrollments = $query->orderByDesc('submission_date')->paginate(10);
+        $enrollments = $query
+        ->orderByRaw("CASE status
+            WHEN 'pending' THEN 1
+            WHEN 'processing' THEN 2
+            WHEN 'query' THEN 3
+            WHEN 'resolved' THEN 4
+            WHEN 'rejected' THEN 5
+            WHEN 'remark' THEN 6
+            ELSE 999 END")
+        ->orderByDesc('submission_date')->paginate(10);
 
         $statusCounts = [
             'pending' => ipe::where('status', 'pending')->count(),

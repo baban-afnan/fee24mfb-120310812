@@ -160,13 +160,7 @@
             <div>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</div>
             <div style="margin:6px 0;">Need help? <a href="mailto:fee24mfb@gmail.com">Contact Support</a></div>
             <div><a href="#" class="unsubscribe">Unsubscribe</a></div>
-          </td>
-
-        <td class="advert" style="width:35%; vertical-align:middle;">
-        <img src="{{ $message->embed(storage_path('app/public/email/001.png')) }}" alt="Special Offer">
-
-
-          </td>
+         
         </tr>
       </table>
     </td>

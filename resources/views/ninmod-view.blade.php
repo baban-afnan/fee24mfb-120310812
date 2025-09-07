@@ -1,8 +1,15 @@
 <x-app-layout>
 
 <x-slot name="title">NIN MOD - Control Form</x-slot>
-<main class="main-content">
+      <div class="page-body">
     <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
     
         <div class="row">
@@ -54,34 +61,8 @@
                 </div>
 
                 {{-- Update Status Form --}}
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Update Status</h6>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('ninmod.update', $enrollmentInfo->id) }}">
-                            @csrf
-                            @method('PUT')
-                            <div class="mb-3">
-                                <label for="status" class="form-label">New Status</label>
-                                <select class="form-select" id="status" name="status" required>
-                                    <option value="pending" {{ $enrollmentInfo->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="processing" {{ $enrollmentInfo->status === 'processing' ? 'selected' : '' }}>Processing</option>
-                                    <option value="resolved" {{ $enrollmentInfo->status === 'resolved' ? 'selected' : '' }}>Resolved</option>
-                                    <option value="rejected" {{ $enrollmentInfo->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="comment" class="form-label">Comment</label>
-                                <textarea class="form-control" id="comment" name="comment" rows="3">{{ old('comment', $enrollmentInfo->comment) }}</textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> Update Status
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                <form method="POST" action="{{ route('ninmod.update', $enrollmentInfo->id) }}">
+                @include ('modal.comment')
 
             {{-- Status History --}}
             <div class="col-lg-4">

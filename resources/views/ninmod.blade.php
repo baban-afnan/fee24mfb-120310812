@@ -129,6 +129,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                   
                     @forelse ($enrollments as $enrollment)
                         <tr>
                             <td>{{ $enrollment->id }}</td>

@@ -1,5 +1,14 @@
 <x-app-layout>
     <x-slot name="title">BVN - Modification</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
     <main class="main-content">
         <div class="container-fluid">
@@ -92,46 +101,9 @@
                         </div>
                     </div>
 
-                    {{-- Update Status Form --}}
-                    <div class="card shadow mb-4">
-                        <div class="card-header">
-                            <h6 class="m-0 font-weight-bold text-primary">Update Status</h6>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" action="{{ route('bvnmod.update', $enrollmentInfo->id) }}">
-                                @csrf
-                                @method('PUT')
-
-                                {{-- Status --}}
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">New Status</label>
-                                    <select class="form-select" id="status" name="status" required>
-                                        <option value="pending" {{ old('status', $enrollmentInfo->status) === 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="processing" {{ old('status', $enrollmentInfo->status) === 'processing' ? 'selected' : '' }}>Processing</option>
-                                        <option value="resolved" {{ old('status', $enrollmentInfo->status) === 'resolved' ? 'selected' : '' }}>Resolved</option>
-                                        <option value="rejected" {{ old('status', $enrollmentInfo->status) === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                    </select>
-                                    @error('status')
-                                        <div class="text-danger small">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                {{-- Comment --}}
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label">Comment</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="3">{{ old('comment', $enrollmentInfo->comment) }}</textarea>
-                                    @error('comment')
-                                        <div class="text-danger small">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Update Status
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                  {{-- Update Status Form --}}
+                <form method="POST" action="{{ route('bvnmod.update', $enrollmentInfo->id) }}">
+                   @include('modal.comment')
 
                 {{-- Right Column --}}
                 <div class="col-lg-4">

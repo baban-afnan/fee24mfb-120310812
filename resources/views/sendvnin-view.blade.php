@@ -1,5 +1,16 @@
 <x-app-layout>
     <x-slot name="title">Vnin Control Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
 <main class="main-content">
     <div class="container-fluid">
 
@@ -74,38 +85,12 @@
                 </div>
 
                 {{-- Update Status Form --}}
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Update Status</h6>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('sendvnin.update', $enrollmentInfo->id) }}">
-                            @csrf
-                            @method('PUT')
-                            <div class="mb-3">
-                                <label for="status" class="form-label">New Status</label>
-                                <select class="form-select" id="status" name="status" required>
-                                    @foreach ($statusColors as $status => $color)
-                                        <option value="{{ $status }}" {{ $enrollmentInfo->status === $status ? 'selected' : '' }}>
-                                            {{ ucfirst($status) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="comment" class="form-label">Comment</label>
-                                <textarea class="form-control" id="comment" name="comment" rows="3">{{ old('comment', $enrollmentInfo->comment) }}</textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> Update Status
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                <form method="POST" action="{{ route('sendvnin.update', $enrollmentInfo->id) }}">
+                @include ('modal.comment')
 
-            {{-- Status History --}}
-            <div class="col-lg-4">
+
+             {{-- Status History --}}
+              <div class="col-lg-4">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Status History</h6>

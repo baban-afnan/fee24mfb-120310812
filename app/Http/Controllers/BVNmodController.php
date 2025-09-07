@@ -14,33 +14,54 @@ use Illuminate\Support\Str;
 
 class BVNmodController extends Controller
 {
-    public function index(Request $request)
-    {
-        $searchbvn = $request->input('search_bvn');
-        $statusFilter = $request->input('status');
+   public function index(Request $request)
+{
+    $searchbvn = $request->input('search_bvn');
+    $statusFilter = $request->input('status');
 
-        $query = BVNmodification::query();
+    $statusOrder = [
+        'pending'    => 1,
+        'processing' => 2,
+        'query'      => 3,
+        'resolved'   => 4,
+        'rejected'   => 5,
+        'remark'     => 6,
+    ];
 
-        if ($searchbvn) {
-            $query->where('bvn', 'like', "%$searchbvn%");
-        }
+    $query = BVNmodification::query();
 
-        if ($statusFilter) {
-            $query->where('status', $statusFilter);
-        }
-
-        $enrollments = $query->orderByDesc('submission_date')->paginate(15);
-
-        $statusCounts = [
-            'pending' => BVNmodification::where('status', 'pending')->count(),
-            'processing' => BVNmodification::where('status', 'processing')->count(),
-            'resolved' => BVNmodification::where('status', 'resolved')->count(),
-            'rejected' => BVNmodification::where('status', 'rejected')->count(),
-        ];
-
-        return view('bvnmod', compact('enrollments', 'searchbvn', 'statusFilter', 'statusCounts'));
+    if ($searchbvn) {
+        $query->where('bvn', 'like', "%$searchbvn%");
     }
 
+    if ($statusFilter) {
+        $query->where('status', $statusFilter);
+    }
+
+    // ⚡ Apply custom status order + submission_date
+    $enrollments = $query
+        ->orderByRaw("CASE status
+            WHEN 'pending' THEN 1
+            WHEN 'processing' THEN 2
+            WHEN 'query' THEN 3
+            WHEN 'resolved' THEN 4
+            WHEN 'rejected' THEN 5
+            WHEN 'remark' THEN 6
+            ELSE 999 END")
+        ->orderByDesc('submission_date')
+        ->paginate(15);
+
+    $statusCounts = [
+        'pending'    => BVNmodification::where('status', 'pending')->count(),
+        'processing' => BVNmodification::where('status', 'processing')->count(),
+        'resolved'   => BVNmodification::where('status', 'resolved')->count(),
+        'rejected'   => BVNmodification::where('status', 'rejected')->count(),
+    ];
+
+        return view('bvnmod', compact('enrollments', 'searchbvn', 'statusFilter', 'statusCounts'));
+        }
+
+        
     public function show($id)
     {
         $enrollmentInfo = BVNmodification::findOrFail($id);

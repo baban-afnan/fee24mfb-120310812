@@ -1,5 +1,14 @@
 <x-app-layout>
-<x-slot name="title">BVN CRM Control Form</x-slot>
+  <x-slot name="title">User Form</x-slot>
+      <div class="page-body">
+    <div class="container-fluid">
+      <div class="page-title">
+        <div class="row">
+          <div class="col-sm-6 col-12">
+          </div>
+        </div>
+      </div>
+    </div>
 
 <div class="row g-4 mb-4">
 
@@ -137,7 +146,7 @@
                                     {{ ucfirst($enrollment->status) }}
                                 </span>
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($enrollment->submission_date)->format('M j, Y g:i A') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($enrollment->created_at)->format('M j, Y g:i A') }}</td>
                             <td>
                                 <a href="{{ route('users.show', $enrollment->id) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> View

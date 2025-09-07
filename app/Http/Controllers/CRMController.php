@@ -15,31 +15,44 @@ use Illuminate\Support\Str;
 class CRMController extends Controller
 {
     public function index(Request $request)
-    {
-        $searchbatch_id = $request->input('search_batch_id');
-        $statusFilter = $request->input('status');
+{
+    $searchticket_id = $request->input('search_ticket_id');
+    $statusFilter   = $request->input('status');
 
-        $query = CRMrequest::query();
+    $query = CRMrequest::query();
 
-        if ($searchbatch_id) {
-            $query->where('batch_id', 'like', "%$searchbatch_id%");
-        }
-
-        if ($statusFilter) {
-            $query->where('status', $statusFilter);
-        }
-
-        $enrollments = $query->orderByDesc('submission_date')->paginate(10);
-
-        $statusCounts = [
-            'pending' => CRMrequest::where('status', 'pending')->count(),
-            'processing' => CRMrequest::where('status', 'processing')->count(),
-            'resolved' => CRMrequest::where('status', 'resolved')->count(),
-            'rejected' => CRMrequest::where('status', 'rejected')->count(),
-        ];
-
-        return view('crmreg', compact('enrollments', 'searchbatch_id', 'statusFilter', 'statusCounts'));
+    if ($searchticket_id) {
+        $query->where('ticket_id', 'like', "%$searchticket_id%");
     }
+
+    if ($statusFilter) {
+        $query->where('status', $statusFilter);
+    }
+
+    // ⚡ Apply custom ordering by status first, then submission_date
+    $enrollments = $query
+        ->orderByRaw("CASE status
+            WHEN 'pending' THEN 1
+            WHEN 'processing' THEN 2
+            WHEN 'query' THEN 3
+            WHEN 'resolved' THEN 4
+            WHEN 'rejected' THEN 5
+            WHEN 'remark' THEN 6
+            ELSE 999 END")
+        ->orderByDesc('submission_date')
+        ->paginate(10);
+
+    $statusCounts = [
+        'pending'    => CRMrequest::where('status', 'pending')->count(),
+        'processing' => CRMrequest::where('status', 'processing')->count(),
+        'query'      => CRMrequest::where('status', 'query')->count(),
+        'resolved'   => CRMrequest::where('status', 'resolved')->count(),
+        'rejected'   => CRMrequest::where('status', 'rejected')->count(),
+        'remark'     => CRMrequest::where('status', 'remark')->count(),
+    ];
+
+    return view('crmreg', compact('enrollments', 'searchticket_id', 'statusFilter', 'statusCounts'));
+}
 
     public function show($id)
     {

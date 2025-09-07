@@ -1,130 +1,144 @@
 <x-app-layout>
-    @php
-        
-        // Date range filtering (optional via query params)
-        $fromInput = request('from');
-        $toInput = request('to');
-        $from = $fromInput ? \Carbon\Carbon::parse($fromInput)->startOfDay() : null;
-        $to = $toInput ? \Carbon\Carbon::parse($toInput)->endOfDay() : null;
+  @php
+    // Date range filtering (optional via query params)
+    $fromInput = request('from');
+    $toInput = request('to');
+    $from = $fromInput ? \Carbon\Carbon::parse($fromInput)->startOfDay() : null;
+    $to = $toInput ? \Carbon\Carbon::parse($toInput)->endOfDay() : null;
 
-        // Base queries
-        $txBaseQuery = \App\Models\Transaction::query();
-        if ($from && $to) {
-            $txBaseQuery->whereBetween('created_at', [$from, $to]);
-        }
+    // Base queries
+    $txBaseQuery = \App\Models\Transaction::query();
+    if ($from && $to) {
+        $txBaseQuery->whereBetween('created_at', [$from, $to]);
+    }
 
-        // Metrics (some filtered by range, some global)
-        $totalUsers = \App\Models\User::count();
-        $totalCredit = (clone $txBaseQuery)->where('type', 'credit')->sum('amount');
-        $totalDebit = (clone $txBaseQuery)->where('type', 'debit')->sum('amount');
-        $totalTransactions = (clone $txBaseQuery)->count();
-        $activeServices = \App\Models\ModificationField::where('is_active', 1)->count();
-        $bvnModifications = \App\Models\BVNmodification::count();
-        $avgTransaction = (float) (clone $txBaseQuery)->avg('amount') ?: 0;
+    // Metrics (some filtered by range, some global)
+    $totalUsers = \App\Models\User::count();
+    $totalCredit = (clone $txBaseQuery)->where('type', 'credit')->sum('amount');
+    $totalDebit = (clone $txBaseQuery)->where('type', 'debit')->sum('amount');
+    $totalTransactions = (clone $txBaseQuery)->count();
+    $activeServices = \App\Models\ModificationField::where('is_active', 1)->count();
+    $bvnModifications = \App\Models\BVNmodification::count();
+    $avgTransaction = (float) (clone $txBaseQuery)->avg('amount') ?: 0;
+    
+    // NEW: Calculate total wallet balance (sum of all wallet balances)
+    $totalWalletBalance = \App\Models\Wallet::sum('wallet_balance');
 
-        // Trends (placeholder logic)
-        $userTrend = ($totalUsers > 0) ? round(($totalUsers / ($totalUsers + rand(10, 50))) * 100, 2) : 0;
-        $creditTrend = ($totalCredit > 0) ? round(($totalCredit / ($totalCredit + rand(1000, 5000))) * 100, 2) : 0;
-        $debitTrend = ($totalDebit > 0) ? round(($totalDebit / ($totalDebit + rand(1000, 5000))) * 100, 2) : 0;
-        $transactionTrend = ($totalTransactions > 0) ? round(($totalTransactions / ($totalTransactions + rand(50, 200))) * 100, 2) : 0;
-        $serviceTrend = ($activeServices > 0) ? round(($activeServices / ($activeServices + rand(2, 5))) * 100, 2) : 0;
-        $bvnTrend = ($bvnModifications > 0) ? round(($bvnModifications / ($bvnModifications + rand(5, 15))) * 100, 2) : 0;
+    // Trends (placeholder logic)
+    $userTrend = ($totalUsers > 0) ? round(($totalUsers / ($totalUsers + rand(10, 50))) * 100, 2) : 0;
+    $creditTrend = ($totalCredit > 0) ? round(($totalCredit / ($totalCredit + rand(1000, 5000))) * 100, 2) : 0;
+    $debitTrend = ($totalDebit > 0) ? round(($totalDebit / ($totalDebit + rand(1000, 5000))) * 100, 2) : 0;
+    $transactionTrend = ($totalTransactions > 0) ? round(($totalTransactions / ($totalTransactions + rand(50, 200))) * 100, 2) : 0;
+    $serviceTrend = ($activeServices > 0) ? round(($activeServices / ($activeServices + rand(2, 5))) * 100, 2) : 0;
+    $bvnTrend = ($bvnModifications > 0) ? round(($bvnModifications / ($bvnModifications + rand(5, 15))) * 100, 2) : 0;
+    
+    // NEW: Wallet balance trend (placeholder)
+    $walletTrend = ($totalWalletBalance > 0) ? round(($totalWalletBalance / ($totalWalletBalance + rand(5000, 15000))) * 100, 2) : 0;
 
-        // Last 7 days time-series for line chart (based on filter if provided, else last 7 days)
-        $periodDays = 7;
-        $lineLabels = [];
-        $creditsData = [];
-        $debitsData = [];
-        for ($i = $periodDays - 1; $i >= 0; $i--) {
-            $day = \Carbon\Carbon::today()->subDays($i);
-            $lineLabels[] = $day->format('M d');
+    // Last 7 days time-series for line chart (based on filter if provided, else last 7 days)
+    $periodDays = 7;
+    $lineLabels = [];
+    $creditsData = [];
+    $debitsData = [];
+    for ($i = $periodDays - 1; $i >= 0; $i--) {
+        $day = \Carbon\Carbon::today()->subDays($i);
+        $lineLabels[] = $day->format('M d');
 
-            $dayQuery = clone $txBaseQuery;
-            // If no range provided, restrict to this day; if range provided, still show the last 7 calendar days
-            $dayCredit = (clone $dayQuery)->whereDate('created_at', $day->toDateString())->where('type', 'credit')->sum('amount');
-            $dayDebit  = (clone $dayQuery)->whereDate('created_at', $day->toDateString())->where('type', 'debit')->sum('amount');
-            $creditsData[] = (float) $dayCredit;
-            $debitsData[] = (float) $dayDebit;
-        }
+        $dayQuery = clone $txBaseQuery;
+        // If no range provided, restrict to this day; if range provided, still show the last 7 calendar days
+        $dayCredit = (clone $dayQuery)->whereDate('created_at', $day->toDateString())->where('type', 'credit')->sum('amount');
+        $dayDebit  = (clone $dayQuery)->whereDate('created_at', $day->toDateString())->where('type', 'debit')->sum('amount');
+        $creditsData[] = (float) $dayCredit;
+        $debitsData[] = (float) $dayDebit;
+    }
 
-        // Doughnut: transaction distribution by amount (credit vs debit)
-        $creditSum = (float) (clone $txBaseQuery)->where('type', 'credit')->sum('amount');
-        $debitSum = (float) (clone $txBaseQuery)->where('type', 'debit')->sum('amount');
+    // Doughnut: transaction distribution by amount (credit vs debit)
+    $creditSum = (float) (clone $txBaseQuery)->where('type', 'credit')->sum('amount');
+    $debitSum = (float) (clone $txBaseQuery)->where('type', 'debit')->sum('amount');
 
-        // Recent transactions (in current filter)
-        $recentTransactions = (clone $txBaseQuery)->latest()->take(10)->get();
+    // Recent transactions (in current filter)
+    $recentTransactions = (clone $txBaseQuery)->latest()->take(10)->get();
 
-        // Widgets configuration
-        $widgets = [
-            [
-                'label' => 'Total Users',
-                'count' => $totalUsers,
-                'color' => 'primary',
-                'icon' => 'bi-people',
-                'trend' => $userTrend > 50 ? 'up' : 'down',
-                'trend_value' => $userTrend . '%',
-                'description' => 'Registered users'
-            ],
-            [
-                'label' => 'Total Credit',
-                'count' => $totalCredit,
-                'color' => 'success',
-                'icon' => 'bi-arrow-down-circle',
-                'trend' => $creditTrend > 50 ? 'up' : 'down',
-                'trend_value' => $creditTrend . '%',
-                'description' => 'In selected range',
-                'formatted' => '₦' . number_format($totalCredit, 2)
-            ],
-            [
-                'label' => 'Total Debit',
-                'count' => $totalDebit,
-                'color' => 'danger',
-                'icon' => 'bi-arrow-up-circle',
-                'trend' => $debitTrend > 50 ? 'up' : 'down',
-                'trend_value' => $debitTrend . '%',
-                'description' => 'In selected range',
-                'formatted' => '₦' . number_format($totalDebit, 2)
-            ],
-            [
-                'label' => 'Transactions',
-                'count' => $totalTransactions,
-                'color' => 'info',
-                'icon' => 'bi-currency-exchange',
-                'trend' => $transactionTrend > 50 ? 'up' : 'down',
-                'trend_value' => $transactionTrend . '%',
-                'description' => 'In selected range'
-            ],
-            [
-                'label' => 'Active Services',
-                'count' => $activeServices,
-                'color' => 'warning',
-                'icon' => 'bi-gear',
-                'trend' => $serviceTrend > 50 ? 'up' : 'down',
-                'trend_value' => $serviceTrend . '%',
-                'description' => 'Available services'
-            ],
-            [
-                'label' => 'BVN Modifications',
-                'count' => $bvnModifications,
-                'color' => 'secondary',
-                'icon' => 'bi-credit-card',
-                'trend' => $bvnTrend > 50 ? 'up' : 'down',
-                'trend_value' => $bvnTrend . '%',
-                'description' => 'Total requests'
-            ],
-            [
-                'label' => 'Avg Tx Amount',
-                'count' => $avgTransaction,
-                'color' => 'primary',
-                'icon' => 'bi-cash-coin',
-                'trend' => 'up',
-                'trend_value' => '—',
-                'description' => 'In selected range',
-                'formatted' => '₦' . number_format($avgTransaction, 2)
-            ],
-        ];
-    @endphp
-
+    // Widgets configuration
+    $widgets = [
+        [
+            'label' => 'Total Users',
+            'count' => $totalUsers,
+            'color' => 'primary',
+            'icon' => 'bi-people',
+            'trend' => $userTrend > 50 ? 'up' : 'down',
+            'trend_value' => $userTrend . '%',
+            'description' => 'Registered users'
+        ],
+        [
+            'label' => 'Total Credit',
+            'count' => $totalCredit,
+            'color' => 'success',
+            'icon' => 'bi-arrow-down-circle',
+            'trend' => $creditTrend > 50 ? 'up' : 'down',
+            'trend_value' => $creditTrend . '%',
+            'description' => 'In selected range',
+            'formatted' => '₦' . number_format($totalCredit, 2)
+        ],
+        [
+            'label' => 'Total Debit',
+            'count' => $totalDebit,
+            'color' => 'danger',
+            'icon' => 'bi-arrow-up-circle',
+            'trend' => $debitTrend > 50 ? 'up' : 'down',
+            'trend_value' => $debitTrend . '%',
+            'description' => 'In selected range',
+            'formatted' => '₦' . number_format($totalDebit, 2)
+        ],
+        [
+            'label' => 'Transactions',
+            'count' => $totalTransactions,
+            'color' => 'info',
+            'icon' => 'bi-currency-exchange',
+            'trend' => $transactionTrend > 50 ? 'up' : 'down',
+            'trend_value' => $transactionTrend . '%',
+            'description' => 'In selected range'
+        ],
+        [
+            'label' => 'Active Services',
+            'count' => $activeServices,
+            'color' => 'warning',
+            'icon' => 'bi-gear',
+            'trend' => $serviceTrend > 50 ? 'up' : 'down',
+            'trend_value' => $serviceTrend . '%',
+            'description' => 'Available services'
+        ],
+        [
+            'label' => 'BVN Modifications',
+            'count' => $bvnModifications,
+            'color' => 'secondary',
+            'icon' => 'bi-credit-card',
+            'trend' => $bvnTrend > 50 ? 'up' : 'down',
+            'trend_value' => $bvnTrend . '%',
+            'description' => 'Total requests'
+        ],
+        [
+            'label' => 'Avg Tx Amount',
+            'count' => $avgTransaction,
+            'color' => 'primary',
+            'icon' => 'bi-cash-coin',
+            'trend' => 'up',
+            'trend_value' => '—',
+            'description' => 'In selected range',
+            'formatted' => '₦' . number_format($avgTransaction, 2)
+        ],
+        [
+            'label' => 'Total Balance',
+            'count' => $totalWalletBalance,
+            'color' => 'info',
+            'icon' => 'bi-wallet',
+            'trend' => $walletTrend > 50 ? 'up' : 'down',
+            'trend_value' => $walletTrend . '%',
+            'description' => 'Total wallet balance',
+            'formatted' => '₦' . number_format($totalWalletBalance, 2)
+        ],
+    ];
+   @endphp
     <div class="support-dashboard">
         <div class="container-fluid py-4">
             <div class="row mb-4">
@@ -133,7 +147,7 @@
                         <div class="card-header bg-transparent pb-3">
                             <div class="d-flex flex-wrap justify-content-between align-items-center">
                                 <div class="mb-2 mb-md-0">
-                                    <h3 class="mb-1"><i class="bi bi-graph-up me-2 text-gradient-primary"></i>Fee24mfb Analytics Dashboard</h3>
+                                    <h3 class="mb-1"><i class="bi bi-graph-up me-2 text-gradient-primary"></i>BiyaNow Analytics Dashboard</h3>
                                     <p class="text-muted mb-0">Interactive metrics, charts, and recent activity</p>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
