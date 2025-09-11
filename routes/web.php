@@ -17,6 +17,7 @@ use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\IpeController;
 use App\Http\Controllers\NINmodController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\EmailController;
 
 
@@ -140,6 +141,13 @@ Route::middleware('auth')->group(function () {
 Route::get('/validation', [ValidationController::class, 'index'])->name('validation.index');
 Route::get('/validation/view/{id}', [ValidationController::class, 'show'])->name('validation.show');
 Route::put('/validation/view/{id}', [ValidationController::class, 'update'])->name('validation.update');
+
+
+// Transaction Routes
+Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/export/pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export.pdf');
+
 });
 
 

@@ -70,7 +70,7 @@ class EnrolmentUserController extends Controller
     public function update(Request $request, $id)
 {
     $request->validate([
-        'status' => 'required|in:pending,processing,resolved,rejected',
+        'status' => 'required|in:pending,processing,resolved,rejected,query,remark',
         'comment' => 'nullable|string',
     ]);
 

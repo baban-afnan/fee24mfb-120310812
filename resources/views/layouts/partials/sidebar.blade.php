@@ -86,7 +86,7 @@
         </a>
       </li>
       <li class="sidebar-list">
-        <a class="sidebar-link" href="">
+        <a class="sidebar-link" href="{{route('transactions.index')}}">
           <i class="fas fa-list-alt fa-lg sidebar-icon"></i>
           <h6 class="sidebar-text f-w-600">Transactions</h6>
         </a>
