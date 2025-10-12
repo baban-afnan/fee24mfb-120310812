@@ -59,6 +59,7 @@
                                     <tr><th>Email ID</th><td>{{ $enrollmentInfo->email }}</td></tr>
                                     <tr><th>Phone No:</th><td>{{ $enrollmentInfo->phone_no }}</td></tr>
                                     <tr><th>Address</th><td>{{ $enrollmentInfo->state }}, {{ $enrollmentInfo->lga }}, {{ $enrollmentInfo->address }}</td></tr>
+                                    <tr><th>Email ID</th><td>{{ $enrollmentInfo->dob }}</td></tr>
                                     <tr>
                                         <th>Current Status</th>
                                         <td>

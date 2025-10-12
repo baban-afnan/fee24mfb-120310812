@@ -23,10 +23,6 @@ use App\Http\Controllers\EmailController;
 
 
 
-
-
-
-
 Route::get('/', function () {
     return view('welcome');
 });

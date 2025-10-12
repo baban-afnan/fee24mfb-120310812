@@ -243,51 +243,72 @@
                 </div>
             </div>
 
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card elegant-shadow border-0">
-                        <div class="card-header bg-transparent border-0 pb-2 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="bi bi-clock-history me-2 text-secondary"></i>Recent Transactions</h5>
-                            <span class="text-muted small">Latest 10 in current filter</span>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div class="table-responsive">
-                                <table id="recentTxTable" class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Type</th>
-                                            <th scope="col">Amount</th>
-                                            <th scope="col">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($recentTransactions as $tx)
-                                            <tr>
-                                                <td>#{{ $tx->id }}</td>
-                                                <td>
-                                                    @php $t = strtolower((string) ($tx->type ?? '')); @endphp
-                                                    <span class="badge rounded-pill bg-{{ $t === 'credit' ? 'success' : ($t === 'debit' ? 'danger' : 'secondary') }}">
-                                                        {{ ucfirst($tx->type ?? 'n/a') }}
-                                                    </span>
-                                                </td>
-                                                <td>₦{{ number_format((float) ($tx->amount ?? 0), 2) }}</td>
-                                                <td>{{ optional($tx->created_at)->format('Y-m-d H:i') }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center text-muted">No transactions found for the selected range.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+           <div class="row mt-4">
+    <div class="col-12">
+        <div class="card elegant-shadow border-0">
+            <div class="card-header bg-transparent border-0 pb-2 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2 text-secondary"></i>Recent Transactions
+                </h5>
+                <span class="text-muted small">Latest 10 in current filter</span>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="table-responsive">
+                    <table id="recentTxTable" class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Performed By</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($recentTransactions as $tx)
+                                <tr>
+                                    <td>#{{ $tx->id }}</td>
+
+                                    {{-- Performed By --}}
+                                    <td>{{ $tx->performed_by ?? 'N/A' }}</td>
+
+
+                                    {{-- discription --}}
+                                    <td>{{ $tx->description ?? 'N/A' }}</td>
+
+                                    {{-- Type --}}
+                                    <td>
+                                        @php
+                                            $t = strtolower((string) ($tx->type ?? ''));
+                                        @endphp
+                                        <span class="badge rounded-pill bg-{{ $t === 'credit' ? 'success' : ($t === 'debit' ? 'danger' : 'secondary') }}">
+                                            {{ ucfirst($tx->type ?? 'n/a') }}
+                                        </span>
+                                    </td>
+
+                                    {{-- Amount --}}
+                                    <td>₦{{ number_format((float) ($tx->amount ?? 0), 2) }}</td>
+
+                                    {{-- Date --}}
+                                    <td>{{ optional($tx->created_at)->format('Y-m-d H:i') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No transactions found for the selected range.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     @include('modal.notification')
 
