@@ -112,7 +112,7 @@ class DashboardController extends Controller
 
         // --- RESTORED LOGIC FOR CHARTS AND TABLE ---
 
-        // Last 7 days time-series for line chart
+        // Last 7 days time-series for line chart (Keeping if needed, but primary focus is Today)
         $periodDays = 7;
         $lineLabels = [];
         $creditsData = [];
@@ -132,8 +132,21 @@ class DashboardController extends Controller
         $creditSum = (float) (clone $txBaseQuery)->where('type', 'credit')->sum('amount');
         $debitSum = (float) (clone $txBaseQuery)->where('type', 'debit')->sum('amount');
 
-        // Recent transactions (in current filter, limited to 10)
+        // Recent transactions (in current filter, limited to 10) - Keeping as fallback or for other views
         $recentTransactions = (clone $txBaseQuery)->latest()->take(10)->get();
+
+        // --- NEW: Today's Data for Redesign ---
+        $today = Carbon::today();
+        $todayTransactions = Transaction::whereDate('created_at', $today)->latest()->get();
+        
+        $dailyStats = [
+            'total' => $todayTransactions->count(),
+            'success' => $todayTransactions->filter(fn($t) => in_array($t->status, ['success', 'completed']))->count(),
+            'pending' => $todayTransactions->where('status', 'pending')->count(),
+            'failed'  => $todayTransactions->where('status', 'failed')->count(),
+            'refund'  => $todayTransactions->where('type', 'refund')->count(),
+            'api'     => 0 // Placeholder
+        ];
 
         return view('dashboard', compact(
             'widgets', 
@@ -142,7 +155,9 @@ class DashboardController extends Controller
             'debitsData', 
             'creditSum', 
             'debitSum', 
-            'recentTransactions'
+            'recentTransactions',
+            'todayTransactions',
+            'dailyStats'
         ));
     }
 }

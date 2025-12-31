@@ -52,104 +52,164 @@
             </div>
 
             <div class="row">
-                <!-- Charts Area (Existing) -->
-                <div class="col-xl-8">
-                    <div class="card elegant-shadow border-0 h-100">
-                        <div class="card-header bg-transparent border-0 pb-2">
-                            <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>Transaction Analytics</h5>
+                {{-- Redesigned Dashboard Content: Today's Tx & Daily Stats --}}
+                <div class="row g-4 mt-2">
+                    <!-- Left Column: Today's Transactions -->
+                    <div class="col-xl-8">
+                        <div class="card border-0 shadow-sm h-100 rounded-4">
+                             <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold"><i class="ti ti-calendar-event me-2 text-primary"></i>Today's Transactions</h5>
+                                <span class="badge bg-light text-dark border">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
+                             </div>
+                             <div class="card-body p-0">
+                                 <div class="table-responsive">
+                                     <table class="table table-hover align-middle mb-0">
+                                         <thead class="bg-light text-muted small text-uppercase">
+                                             <tr>
+                                                 <th class="ps-4">#</th>
+                                                 <th>Ref ID</th>
+                                                 <th>Type</th>
+                                                 <th>Amount</th>
+                                                 <th>Time</th>
+                                                 <th class="text-end pe-4">Status</th>
+                                             </tr>
+                                         </thead>
+                                         <tbody>
+                                            @forelse($todayTransactions as $index => $tx)
+                                                <tr>
+                                                    <td class="ps-4 text-muted">{{ $index + 1 }}</td>
+                                                    <td class="fw-bold text-dark">{{ Str::limit($tx->transaction_ref, 10) }}...</td>
+                                                    <td>
+                                                        @if($tx->type == 'credit')
+                                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2">
+                                                                <i class="ti ti-arrow-down-left me-1"></i>Credit
+                                                            </span>
+                                                        @elseif($tx->type == 'debit')
+                                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2">
+                                                                <i class="ti ti-arrow-up-right me-1"></i>Debit
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2">{{ ucfirst($tx->type) }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="fw-bold {{ $tx->type == 'credit' ? 'text-success' : 'text-danger' }}">
+                                                        {{ $tx->type == 'credit' ? '+' : '-' }}₦{{ number_format($tx->amount, 2) }}
+                                                    </td>
+                                                    <td class="text-muted">{{ $tx->created_at->format('h:i A') }}</td>
+                                                    <td class="text-end pe-4">
+                                                        @if($tx->status == 'completed' || $tx->status == 'success')
+                                                            <span class="badge bg-success rounded-pill px-3">Success</span>
+                                                        @elseif($tx->status == 'pending')
+                                                            <span class="badge bg-warning text-white rounded-pill px-3">Pending</span>
+                                                        @else
+                                                            <span class="badge bg-danger rounded-pill px-3">Failed</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-5 text-muted">
+                                                        No transactions yet today.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                         </tbody>
+                                     </table>
+                                 </div>
+                             </div>
                         </div>
-                        <div class="card-body pt-0">
-                            <div class="chart-container" style="height: 320px;">
-                                <canvas id="transactionChart"
-                                        data-labels='@json($lineLabels)'
-                                        data-credits='@json($creditsData)'
-                                        data-debits='@json($debitsData)'></canvas>
+                    </div>
+
+                    <!-- Right Column: Daily Statistics -->
+                    <div class="col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 rounded-4">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h5 class="mb-0 fw-bold"><i class="ti ti-chart-pie me-2 text-dark"></i>Daily Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Donut Chart -->
+                                <div class="position-relative d-flex justify-content-center align-items-center mb-4" style="height: 200px;">
+                                    <canvas id="dailyStatsChart"></canvas>
+                                    <div class="position-absolute text-center" style="pointer-events: none;">
+                                        <div class="text-muted small">Total</div>
+                                        <div class="h3 fw-bold mb-0">{{ $dailyStats['total'] }}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Stats Grid -->
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 text-center" style="background-color: #d1fae5;">
+                                            <h4 class="fw-bold text-success mb-0">{{ $dailyStats['success'] }}</h4>
+                                            <small class="text-success text-uppercase fw-bold" style="font-size: 0.7rem;">Success</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 text-center" style="background-color: #fef3c7;">
+                                            <h4 class="fw-bold text-warning mb-0">{{ $dailyStats['pending'] }}</h4>
+                                            <small class="text-warning text-uppercase fw-bold" style="font-size: 0.7rem;">Pending</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 text-center" style="background-color: #fee2e2;">
+                                            <h4 class="fw-bold text-danger mb-0">{{ $dailyStats['failed'] }}</h4>
+                                            <small class="text-danger text-uppercase fw-bold" style="font-size: 0.7rem;">Failed</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 text-center" style="background-color: #e0f2fe;">
+                                            <h4 class="fw-bold text-info mb-0">{{ $dailyStats['refund'] }}</h4>
+                                            <small class="text-info text-uppercase fw-bold" style="font-size: 0.7rem;">Refund</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4">
-                    <div class="card elegant-shadow border-0 h-100">
-                        <div class="card-header bg-transparent border-0 pb-2">
-                            <h5 class="mb-0"><i class="bi bi-pie-chart me-2 text-info"></i>Transaction Mix</h5>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div class="chart-container" style="height: 320px;">
-                                <canvas id="transactionTypeChart"
-                                        data-creditsum='{{ $creditSum }}'
-                                        data-debitsum='{{ $debitSum }}'></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-           <div class="row mt-4">
-    <div class="col-12">
-        <div class="card elegant-shadow border-0">
-            <div class="card-header bg-transparent border-0 pb-2 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="bi bi-clock-history me-2 text-secondary"></i>Recent Transactions
-                </h5>
-                <span class="text-muted small">Latest 10 in current filter</span>
-            </div>
-
-            <div class="card-body pt-0">
-                <div class="table-responsive">
-                    <table id="recentTxTable" class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Performed By</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Amount</th>
-                                <th scope="col">Date</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($recentTransactions as $tx)
-                                <tr>
-                                    <td>#{{ $tx->id }}</td>
-
-                                    {{-- Performed By --}}
-                                    <td>{{ $tx->performed_by ?? 'N/A' }}</td>
-
-
-                                    {{-- discription --}}
-                                    <td>{{ $tx->description ?? 'N/A' }}</td>
-
-                                    {{-- Type --}}
-                                    <td>
-                                        @php
-                                            $t = strtolower((string) ($tx->type ?? ''));
-                                        @endphp
-                                        <span class="badge rounded-pill bg-{{ $t === 'credit' ? 'success' : ($t === 'debit' ? 'danger' : 'secondary') }}">
-                                            {{ ucfirst($tx->type ?? 'n/a') }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Amount --}}
-                                    <td>₦{{ number_format((float) ($tx->amount ?? 0), 2) }}</td>
-
-                                    {{-- Date --}}
-                                    <td>{{ optional($tx->created_at)->format('Y-m-d H:i') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">
-                                        No transactions found for the selected range.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ctx = document.getElementById('dailyStatsChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Success', 'Pending', 'Failed', 'Refund'],
+                                datasets: [{
+                                    data: [
+                                        {{ $dailyStats['success'] }}, 
+                                        {{ $dailyStats['pending'] }}, 
+                                        {{ $dailyStats['failed'] }},
+                                        {{ $dailyStats['refund'] }}
+                                    ],
+                                    backgroundColor: [
+                                        '#22c55e', // Success Green
+                                        '#f59e0b', // Pending Warning
+                                        '#ef4444', // Failed Danger
+                                        '#3b82f6'  // Refund Info
+                                    ],
+                                    borderWidth: 0,
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                cutout: '75%',
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                         callbacks: {
+                                            label: function(context) {
+                                                return ' ' + context.label + ': ' + context.raw;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                </script>
 
     @include('modal.notification')
 
