@@ -1,16 +1,28 @@
+```html
 <x-app-layout>
       <x-slot name="title">BVN CRM Request Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="card shadow-sm rounded-lg mb-4 mt-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h4 class="mb-1 font-weight-bold text-primary">CRM Request Details</h4>
+                        <p class="text-muted mb-0">View and manage CRM request</p>
+                    </div>
+                    <div>
+                        <a href="{{ route('crmreg.index') }}" class="btn btn-outline-secondary fw-bold me-2 px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Back to List
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold px-4" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+                            <i class="fas fa-edit me-2"></i> Update Request
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-<main class="main-content">
-    <div class="container-fluid">
+
+    <main class="main-content">
+        <div class="container-fluid">
 
       @if (session('errorMessage'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -43,7 +55,7 @@
                                         <td>
                                             {{ $enrollmentInfo->user_id }}
                                             @if(!empty($user))
-                                                <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
                                                     View Agent Info
                                                 </button>
                                             @endif
@@ -51,14 +63,15 @@
                                     </tr>
                                     <tr><th>Request ID</th><td>{{ $enrollmentInfo->id }}</td></tr>
                                     <tr><th>Transaction ID</th><td>{{ $enrollmentInfo->reference }}</td></tr>
+                                    <tr><th>Tracking ID</th><td>{{ $enrollmentInfo->tracking_id }}</td></tr>
                                     <tr><th>Batch ID</th><td>{{ $enrollmentInfo->batch_id }}</td></tr>
                                     <tr><th>Ticket_id</th><td>{{ $enrollmentInfo->ticket_id }}</td></tr>
                                     <tr>
                                         <th>Current Status</th>
                                         <td>
                                             <span class="badge bg-{{
-                                                $enrollmentInfo->status === 'pending' ? 'warning' :
-                                                ($enrollmentInfo->status === 'processing' ? 'info' :
+                                                $enrollmentInfo->status === 'pending' ? 'info' :
+                                                ($enrollmentInfo->status === 'processing' ? 'primary' :
                                                 ($enrollmentInfo->status === 'resolved' ? 'success' :
                                                 ($enrollmentInfo->status === 'rejected' ? 'danger' : 'secondary')))
                                             }}">
@@ -73,10 +86,7 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Update Status Form --}}
-                <form method="POST" action="{{ route('crmreg.update', $enrollmentInfo->id) }}">
-                @include ('modal.comment')
+            </div>
 
             {{-- Status History --}}
             <div class="col-lg-4">
@@ -130,6 +140,34 @@
                     </div>
                 </div>
             </div>
+
+            </div>
+        </div>
+    </main>
+
+    @include('modal.user')
+    @include('modal.comment')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the form action dynamically when the modal is opened
+            const statusUpdateModal = document.getElementById('statusUpdateModal');
+            const statusUpdateForm = document.getElementById('statusUpdateForm');
+            const updateUrl = "{{ route('crmreg.update', $enrollmentInfo->id) }}";
+
+            statusUpdateModal.addEventListener('show.bs.modal', function (event) {
+                statusUpdateForm.action = updateUrl;
+                
+                // Pre-select current status
+                const currentStatus = "{{ $enrollmentInfo->status }}";
+                const statusSelect = document.getElementById('status');
+                if(statusSelect) {
+                    statusSelect.value = currentStatus;
+                    statusSelect.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
         </div>
     </div>
 </main>

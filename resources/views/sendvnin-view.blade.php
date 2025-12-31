@@ -1,18 +1,28 @@
 <x-app-layout>
     <x-slot name="title">Vnin Control Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="card shadow-sm rounded-lg mb-4 mt-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h4 class="mb-1 font-weight-bold text-primary">VNIN to NIBSS Details</h4>
+                        <p class="text-muted mb-0">View and manage VNIN to NIBSS request</p>
+                    </div>
+                    <div>
+                        <a href="{{ route('sendvnin.index') }}" class="btn btn-outline-secondary fw-bold me-2 px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Back to List
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold px-4" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+                            <i class="fas fa-edit me-2"></i> Update Request
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
-    
-<main class="main-content">
-    <div class="container-fluid">
+    <main class="main-content">
+        <div class="container-fluid">
 
 @if (session('errorMessage'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -55,7 +65,7 @@
                                         <td>
                                             {{ $enrollmentInfo->user_id }}
                                             @if(!empty($user))
-                                                <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
                                                     View Agent Info
                                                 </button>
                                             @endif
@@ -84,13 +94,19 @@
                     </div>
                 </div>
 
-                {{-- Update Status Form --}}
-                <form method="POST" action="{{ route('sendvnin.update', $enrollmentInfo->id) }}">
-                @include ('modal.comment')
+                {{-- Status Actions Card --}}
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary btn-block w-100 mb-3" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+                            <i class="fas fa-edit me-2"></i> Update Status
+                        </button>
+                    </div>
+                </div>
 
-
-             {{-- Status History --}}
-              <div class="col-lg-4">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Status History</h6>
@@ -132,9 +148,35 @@
                     </div>
                 </div>
             </div>
+
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+
+    @include('modal.user')
+    @include('modal.comment')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the form action dynamically when the modal is opened
+            const statusUpdateModal = document.getElementById('statusUpdateModal');
+            const statusUpdateForm = document.getElementById('statusUpdateForm');
+            const updateUrl = "{{ route('sendvnin.update', $enrollmentInfo->id) }}";
+
+            statusUpdateModal.addEventListener('show.bs.modal', function (event) {
+                statusUpdateForm.action = updateUrl;
+                
+                // Pre-select current status
+                const currentStatus = "{{ $enrollmentInfo->status }}";
+                const statusSelect = document.getElementById('status');
+                if(statusSelect) {
+                    statusSelect.value = currentStatus;
+                    statusSelect.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
+
 
 {{-- Agent Info Modal --}}
 @include('modal.user')

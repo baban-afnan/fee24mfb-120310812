@@ -9,17 +9,37 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+   public function up(): void
+{
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+
+        $table->string('first_name', 50);
+        $table->string('last_name', 50);
+        $table->string('middle_name', 100)->nullable();
+        $table->string('email', 100)->unique();
+        $table->timestamp('email_verified_at')->nullable();
+        $table->string('password');
+        $table->string('phone_no', 20)->nullable();
+        $table->text('address')->nullable();
+        $table->string('referral_code')->nullable();
+        $table->decimal('referral_bonus', 15, 2)->default(0.0);
+        $table->bigInteger('referred_by')->nullable();
+        $table->bigInteger('claim_id')->default(0);
+        $table->dateTimeTz('deleted_at')->nullable();
+        $table->string('deleted_by')->nullable();
+        $table->string('bvn', 20)->nullable();
+        $table->string('nin', 20)->nullable();
+        $table->string('photo', 255)->nullable();
+        $table->string('profile_photo_url', 255)->nullable();
+        $table->enum('role', ['user', 'agent', 'admin'])->default('user');
+        $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
+        $table->datetime('last_login')->nullable();
+        $table->rememberToken();
+        $table->timestamps();
+    });
+
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

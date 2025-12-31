@@ -1,46 +1,53 @@
 <x-app-layout>
   <x-slot name="title">User Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
+
+@push('styles')
+    <x-crm-card-styles />
+@endpush
 
 <div class="row g-4 mb-4">
 
-   <div class="col-md-3">
-        <div class="card text-white bg-success h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <small class="text-uppercase fw-bold">You have did a great Job</small>
-                <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">USERS</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['active'] ?? 0 }}</h4>
+    <div class="col-md-4">
+        <div class="card crm-card bg-gradient-resolved">
+            <div class="card-body crm-card-body">
+                <div>
+                    <h6 class="card-title-text">Active Users</h6>
+                    <h4 class="card-amount">{{ $statusCounts['active'] ?? 0 }}</h4>
+                    <small class="text-white-50" style="font-size: 0.7rem;">Confirmed Users</small>
+                </div>
+                <div class="card-icon-box">
+                    <i class="bi bi-check-circle-fill fs-4 text-white"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card text-white bg-info h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-gear-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Inactive Users</h6>
-                <small class="text-uppercase fw-bold">Call them and follow up</small>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['inactive'] ?? 0 }}</h4>
+    <div class="col-md-4">
+        <div class="card crm-card bg-gradient-processing">
+            <div class="card-body crm-card-body">
+                <div>
+                    <h6 class="card-title-text">Inactive Users</h6>
+                    <h4 class="card-amount">{{ $statusCounts['inactive'] ?? 0 }}</h4>
+                    <small class="text-white-50" style="font-size: 0.7rem;">Need Follow-up</small>
+                </div>
+                <div class="card-icon-box">
+                    <i class="bi bi-gear-fill fs-4 text-white"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card text-white bg-danger h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-x-octagon-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Suspended</h6>
-                <h4 class="fw-bold mb-2">{{ $statusCounts['suspended'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Don’t give up — Motivate them push more</small>
+    <div class="col-md-4">
+        <div class="card crm-card bg-gradient-rejected">
+            <div class="card-body crm-card-body">
+                <div>
+                    <h6 class="card-title-text">Suspended</h6>
+                    <h4 class="card-amount">{{ $statusCounts['suspended'] ?? 0 }}</h4>
+                    <small class="text-white-50" style="font-size: 0.7rem;">Account Restricted</small>
+                </div>
+                <div class="card-icon-box">
+                    <i class="bi bi-x-octagon-fill fs-4 text-white"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -51,7 +58,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Users</h6>
+        <h6 class="m-0 font-weight-bold text-primary">User Form</h6>
         <div class="dropdown no-arrow">
             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical text-gray-400"></i>
@@ -162,27 +169,9 @@
             </table>
 
             {{-- Pagination --}}
-            @if ($enrollments->lastPage() > 1)
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item {{ $enrollments->onFirstPage() ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ $enrollments->previousPageUrl() }}">
-                                <i class="bi bi-chevron-left"></i> Previous
-                            </a>
-                        </li>
-                        @for ($i = 1; $i <= $enrollments->lastPage(); $i++)
-                            <li class="page-item {{ $enrollments->currentPage() == $i ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $enrollments->url($i) }}">{{ $i }}</a>
-                            </li>
-                        @endfor
-                        <li class="page-item {{ !$enrollments->hasMorePages() ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ $enrollments->nextPageUrl() }}">
-                                Next <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            @endif
+            <div class="d-flex justify-content-center mt-4">
+                {{ $enrollments->onEachSide(1)->links('vendor.pagination.custom') }}
+            </div>
         </div>
     </div>
 </div>

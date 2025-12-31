@@ -1,68 +1,14 @@
 <x-app-layout>
 <x-slot name="title">BVN Search Control Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
 
-<div class="row g-4 mb-4">
-
-    <div class="col-md-3">
-        <div class="card text-white bg-primary h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-hourglass-split fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Pending</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['pending'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Work on this request its Urgent!</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-info h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-gear-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Processing</h6>
-                <small class="text-uppercase fw-bold">Check and confirm The status</small>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['processing'] ?? 0 }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-success h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <small class="text-uppercase fw-bold">You have did a great Job</small>
-                <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Resolved</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['resolved'] ?? 0 }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-danger h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-x-octagon-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Rejected</h6>
-                <h4 class="fw-bold mb-2">{{ $statusCounts['rejected'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Don’t give up — Kept accepting Request</small>
-            </div>
-        </div>
-    </div>
-</div>
+<x-status-cards :statusCounts="$statusCounts" />
 
 
 
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">BVN Search request</h6>
+        <h6 class="m-0 font-weight-bold text-primary">BVN Search Control Form</h6>
         <div class="dropdown no-arrow">
             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical text-gray-400"></i>
@@ -178,27 +124,9 @@
             </table>
 
             {{-- Pagination --}}
-            @if ($enrollments->lastPage() > 1)
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item {{ $enrollments->onFirstPage() ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ $enrollments->previousPageUrl() }}">
-                                <i class="bi bi-chevron-left"></i> Previous
-                            </a>
-                        </li>
-                        @for ($i = 1; $i <= $enrollments->lastPage(); $i++)
-                            <li class="page-item {{ $enrollments->currentPage() == $i ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $enrollments->url($i) }}">{{ $i }}</a>
-                            </li>
-                        @endfor
-                        <li class="page-item {{ !$enrollments->hasMorePages() ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ $enrollments->nextPageUrl() }}">
-                                Next <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            @endif
+            <div class="d-flex justify-content-center mt-4">
+                {{ $enrollments->onEachSide(1)->links('vendor.pagination.custom') }}
+            </div>
         </div>
     </div>
 </div>

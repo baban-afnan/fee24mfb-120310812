@@ -1,19 +1,29 @@
 <x-app-layout>
       <x-slot name="title">Validation Request Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="card shadow-sm rounded-lg mb-4 mt-4">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h4 class="mb-1 font-weight-bold text-primary">Validation Request Details</h4>
+                        <p class="text-muted mb-0">View and manage validation request</p>
+                    </div>
+                    <div>
+                        <a href="{{ route('validation.index') }}" class="btn btn-outline-secondary fw-bold me-2 px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Back to List
+                        </a>
+                        <button type="button" class="btn btn-primary fw-bold px-4" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+                            <i class="fas fa-edit me-2"></i> Update Request
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
 <main class="main-content">
     <div class="container-fluid">
 
-      @if (session('errorMessage'))
+@if (session('errorMessage'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <strong>Error!</strong> {{ session('errorMessage') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -27,13 +37,23 @@
     </div>
 @endif
 
+@php
+    $statusColors = [
+        'pending' => 'warning',
+        'processing' => 'info',
+        'resolved' => 'success',
+        'rejected' => 'danger',
+        'query' => 'info',
+        'remark' => 'primary',
+    ];
+@endphp
 
         <div class="row">
             <div class="col-lg-8">
                 {{-- Enrollment Information --}}
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Enrollment Information</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Validation Information</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -44,43 +64,49 @@
                                         <td>
                                             {{ $enrollmentInfo->user_id }}
                                             @if(!empty($user))
-                                                <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#agentInfoModal">
                                                     View Agent Info
                                                 </button>
                                             @endif
                                         </td>
                                     </tr>
                                     <tr><th>Request ID</th><td>{{ $enrollmentInfo->id }}</td></tr>
-                                    <tr><th>Transaction ID</th><td>{{ $enrollmentInfo->reference }}</td></tr>
-                                    <tr><th>NIN ID</th><td>{{ $enrollmentInfo->nin }}</td></tr>
+                                    <tr><th>Transaction Reference</th><td>{{ $enrollmentInfo->reference }}</td></tr>
+                                    <tr><th>Phone Number</th><td>{{ $enrollmentInfo->phone_number }}</td></tr>
+                                    <tr><th>Validation Type</th><td>{{ $enrollmentInfo->type }}</td></tr>
+                                    <tr><th>NIN</th><td>{{ $enrollmentInfo->nin }}</td></tr>
+                                    <tr><th>Note</th><td>{{ $enrollmentInfo->note ?? 'N/A' }}</td></tr>
                                     <tr>
                                         <th>Current Status</th>
                                         <td>
-                                            <span class="badge bg-{{
-                                                $enrollmentInfo->status === 'pending' ? 'warning' :
-                                                ($enrollmentInfo->status === 'processing' ? 'info' :
-                                                ($enrollmentInfo->status === 'resolved' ? 'success' :
-                                                ($enrollmentInfo->status === 'rejected' ? 'danger' : 'secondary')))
-                                            }}">
+                                            @php $badgeColor = $statusColors[$enrollmentInfo->status] ?? 'secondary'; @endphp
+                                            <span class="badge bg-{{ $badgeColor }}">
                                                 {{ ucfirst($enrollmentInfo->status) }}
                                             </span>
                                         </td>
                                     </tr>
                                     <tr><th>Comment</th><td>{{ $enrollmentInfo->comment ?? 'N/A' }}</td></tr>
-                                    <tr><th>Date Created</th><td>{{ $enrollmentInfo->submission_date ? \Carbon\Carbon::parse($enrollmentInfo->submission_date)->format('M j, Y g:i A') : 'N/A' }}</td></tr>
+                                    <tr><th>Date Created</th><td>{{ $enrollmentInfo->created_at ? \Carbon\Carbon::parse($enrollmentInfo->created_at)->format('M j, Y g:i A') : 'N/A' }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                {{-- Update Status Form --}}
-                <form method="POST" action="{{ route('validation.update', $enrollmentInfo->id) }}">
-               @include('modal.comment')
+                {{-- Status Actions Card --}}
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary btn-block w-100 mb-3" data-bs-toggle="modal" data-bs-target="#statusUpdateModal">
+                            <i class="fas fa-edit me-2"></i> Update Status
+                        </button>
+                    </div>
+                </div>
 
-               {{-- Status History --}}
-                <div class="col-lg-4">
-                   <div class="card shadow mb-4">
+                <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Status History</h6>
                     </div>
@@ -130,6 +156,34 @@
                     </div>
                 </div>
             </div>
+
+            </div>
+        </div>
+    </main>
+
+    @include('modal.user')
+    @include('modal.comment')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the form action dynamically when the modal is opened
+            const statusUpdateModal = document.getElementById('statusUpdateModal');
+            const statusUpdateForm = document.getElementById('statusUpdateForm');
+            const updateUrl = "{{ route('validation.update', $enrollmentInfo->id) }}";
+
+            statusUpdateModal.addEventListener('show.bs.modal', function (event) {
+                statusUpdateForm.action = updateUrl;
+                
+                // Pre-select current status
+                const currentStatus = "{{ $enrollmentInfo->status }}";
+                const statusSelect = document.getElementById('status');
+                if(statusSelect) {
+                    statusSelect.value = currentStatus;
+                    statusSelect.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
         </div>
     </div>
 </main>

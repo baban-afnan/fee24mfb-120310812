@@ -1,14 +1,5 @@
 <x-app-layout>
     <x-slot name="title">Transaction History</x-slot>
-       <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="page-body">
         <div class="container-fluid">
@@ -30,21 +21,71 @@
                 <div class="card-header bg-white border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                     <div>
                         <h5 class="fw-bold text-primary mb-1">
-                            <i class="fas fa-exchange-alt me-2"></i> Transaction Records
+                            <i class="fas fa-exchange-alt me-2"></i> Transaction History
                         </h5>
                         <p class="text-muted small mb-0">Your complete financial activity history</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-end">
-                        <div class="badge bg-light text-dark fs-6 mb-2 px-3 py-2">
-                            <i class="fas fa-wallet text-primary me-2"></i>
-                            <span class="text-primary fs-6">
-                                Balance: ₦{{ number_format($totalAmount, 2) }}
-                            </span>
-                        </div>
                     </div>
                 </div>
 
                 <div class="card-body">
+
+                    {{-- Stats Overview --}}
+                    <div class="row g-3 mb-4">
+                        {{-- Wallet Balance --}}
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-white-50 mb-0">Wallet Balance</h6>
+                                        <i class="fas fa-wallet fa-lg opacity-50"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-0">₦{{ number_format($walletBalance, 2) }}</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Total Funded (Credits) --}}
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm bg-success-subtle text-success h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-success-emphasis mb-0">Total Funded</h6>
+                                        <i class="fas fa-arrow-down fa-lg opacity-50"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-0">₦{{ number_format($totalCredits, 2) }}</h4>
+                                    <small class="text-success-emphasis opacity-75">Based on filter</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Total Spent (Debits) --}}
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm bg-danger-subtle text-danger h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-danger-emphasis mb-0">Total Spent</h6>
+                                        <i class="fas fa-arrow-up fa-lg opacity-50"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-0">₦{{ number_format($totalDebits, 2) }}</h4>
+                                    <small class="text-danger-emphasis opacity-75">Based on filter</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Total Refunds --}}
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm bg-info-subtle text-info-emphasis h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-info-emphasis mb-0">Total Refunds</h6>
+                                        <i class="fas fa-undo fa-lg opacity-50"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-0">₦{{ number_format($totalRefunds, 2) }}</h4>
+                                    <small class="text-info-emphasis opacity-75">Based on filter</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     {{-- Filter Section --}}
                     <div class="card mb-4 shadow-sm border-0">
@@ -178,7 +219,7 @@
                     {{-- Pagination --}}
                     @if ($transactions->hasPages())
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $transactions->withQueryString()->links('pagination::bootstrap-5') }}
+                            {{ $transactions->withQueryString()->links('vendor.pagination.custom') }}
                         </div>
                     @endif
 

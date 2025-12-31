@@ -1,14 +1,5 @@
 <x-app-layout>
     <x-slot name="title">Wallet Management Control Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Container-fluid starts -->
     <div class="container-fluid">
@@ -18,7 +9,7 @@
                     
                     <!-- Card Header -->
                     <div class="card-header card-no-border pb-0">
-                        <h3 class="m-b-0 f-w-700">System Management</h3>
+                        <h3 class="m-b-0 f-w-700">Wallet Management Control Form</h3>
                     </div>
 
                     <!-- Card Body -->

@@ -1,14 +1,5 @@
 <x-app-layout>
     <x-slot name="title">General wallet - Control Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
 
 
 <div class="container py-4">
@@ -17,7 +8,7 @@
             <div class="card shadow">
                 <div class="card-header bg-primary text-white d-flex align-items-center">
                     <i class="bi bi-cash-coin me-2 fs-4"></i>
-                    <h5 class="mb-0">General Wallet Funding</h5>
+                    <h5 class="mb-0">General wallet - Control Form</h5>
                 </div>
 
                 <div class="card-body">

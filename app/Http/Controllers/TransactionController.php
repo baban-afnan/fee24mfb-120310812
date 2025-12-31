@@ -13,41 +13,54 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+
         // Filters
         $search     = $request->input('search_transaction_id');
         $recordType = $request->input('record_type');
         $fromDate   = $request->input('from_date');
         $toDate     = $request->input('to_date');
 
-        // Base query (🔹 no user restriction → all transactions)
-        $transactionsQuery = Transaction::query();
+        // 1. Base Query for Stats (Apply Search & Date only, IGNORE Type)
+        //    This ensures cards show "Total Credits" for the selected date range, 
+        //    even if the user is currently viewing the "Debits" tab.
+        $statsQuery = Transaction::where('user_id', $user->id);
 
         if ($search) {
-            $transactionsQuery->where('transaction_ref', 'like', "%{$search}%");
-        }
-
-        if ($recordType) {
-            $transactionsQuery->where('type', $recordType);
+            $statsQuery->where('transaction_ref', 'like', "%{$search}%");
         }
 
         if ($fromDate && $toDate) {
-            $transactionsQuery->whereBetween('created_at', [$fromDate, $toDate]);
+            $statsQuery->whereBetween('created_at', [$fromDate, $toDate]);
         } elseif ($fromDate) {
-            $transactionsQuery->whereDate('created_at', '>=', $fromDate);
+            $statsQuery->whereDate('created_at', '>=', $fromDate);
         } elseif ($toDate) {
-            $transactionsQuery->whereDate('created_at', '<=', $toDate);
+            $statsQuery->whereDate('created_at', '<=', $toDate);
         }
 
-        $transactions = $transactionsQuery->orderBy('created_at', 'desc')->paginate(10);
+        // Calculate Stats for Cards (Clone query to avoid mutating for next calc)
+        $totalCredits = (clone $statsQuery)->where('type', 'credit')->sum('amount');
+        $totalDebits  = (clone $statsQuery)->where('type', 'debit')->sum('amount');
+        $totalRefunds = (clone $statsQuery)->where('type', 'refund')->sum('amount');
+        
+        // 2. Query for Table List (Apply Search, Date, AND Type)
+        $listQuery = (clone $statsQuery); // Start with the same date/search filters
 
-        // Balance summary (credits add, debits subtract)
-        $totalAmount = Transaction::all()->sum(function ($txn) {
-            return $txn->type === 'credit' ? $txn->amount : -$txn->amount;
-        });
+        if ($recordType) {
+            $listQuery->where('type', $recordType);
+        }
+
+        $transactions = $listQuery->orderBy('created_at', 'desc')->paginate(10);
+
+        // 3. User Wallet Balance (Actual Balance)
+        $walletBalance = $user->wallet ? $user->wallet->balance : 0.00;
 
         return view('transactions', [
             'transactions' => $transactions,
-            'totalAmount'  => $totalAmount,
+            'walletBalance' => $walletBalance,
+            'totalCredits' => $totalCredits,
+            'totalDebits'  => $totalDebits,
+            'totalRefunds' => $totalRefunds,
             'search'       => $search,
             'recordType'   => $recordType,
             'fromDate'     => $fromDate,

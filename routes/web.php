@@ -16,9 +16,9 @@ use App\Http\Controllers\NotificationAdd;
 use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\IpeController;
 use App\Http\Controllers\NINmodController;
-use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -27,9 +27,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,14 +38,32 @@ Route::middleware('auth')->group(function () {
 
 
 // Service Routes
-Route::middleware('auth')->group(function () {
-Route::get('/nin-services', [ServiceController::class, 'nin'])->name('services.nin');
-Route::get('/bvn-services', [ServiceController::class, 'bvn'])->name('services.bvn');
-Route::get('/verification', [ServiceController::class, 'verification'])->name('services.verification');
-Route::get('/vip-services', [ServiceController::class, 'vip'])->name('services.vip');
-Route::get('/management-services', [ServiceController::class, 'management'])->name('services.management'); 
-Route::get('/wallet-services', [ServiceController::class, 'wallet'])->name('services.wallet');   
+
+use App\Http\Controllers\Admin\AdminServiceController;
+
+// ...
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // ... existing routes ...
+
+    // Admin Services Management
+    Route::prefix('admin/services')->name('admin.services.')->group(function () {
+        Route::get('/', [AdminServiceController::class, 'index'])->name('index');
+        Route::post('/', [AdminServiceController::class, 'store'])->name('store');
+        Route::get('/{service}', [AdminServiceController::class, 'show'])->name('show');
+        Route::put('/{service}', [AdminServiceController::class, 'update'])->name('update');
+        Route::delete('/{service}', [AdminServiceController::class, 'destroy'])->name('destroy');
+
+        // Field Management
+        Route::post('/{service}/fields', [AdminServiceController::class, 'storeField'])->name('fields.store');
+        Route::put('/{service}/fields/{field}', [AdminServiceController::class, 'updateField'])->name('fields.update');
+        Route::delete('/{service}/fields/{field}', [AdminServiceController::class, 'destroyField'])->name('fields.destroy');
+
+        // Price Management
+        Route::post('/{service}/prices', [AdminServiceController::class, 'storePrice'])->name('prices.store');
+    });
 });
+
 
 
 
@@ -71,6 +87,7 @@ Route::put('/ninmod/view/{id}', [NINmodController::class, 'update'])->name('ninm
 // BVN CRM Routes
 Route::middleware('auth')->group(function () {
 Route::get('/crmreg', [CRMController::class, 'index'])->name('crmreg.index');
+Route::get('/crmreg/export/pending', [CRMController::class, 'exportPending'])->name('crmreg.export.pending');
 Route::get('/crmreg/view/{id}', [CRMController::class, 'show'])->name('crmreg.show');
 Route::put('/crmreg/view/{id}', [CRMController::class, 'update'])->name('crmreg.update');
 });
@@ -147,10 +164,7 @@ Route::get('/export/pdf', [TransactionController::class, 'exportPdf'])->name('tr
 });
 
 
-Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
-Route::post('/enrollments/upload', [EnrollmentController::class, 'upload'])->name('enrollments.upload');
-Route::put('/enrollments/{enrollment}/update-status', [EnrollmentController::class, 'updateStatus'])->name('enrollments.update-status');
-Route::get('/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
+
 
 // BVN Serach Using Phone Number Routes
 Route::middleware('auth')->group(function () {

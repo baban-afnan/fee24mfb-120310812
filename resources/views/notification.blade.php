@@ -1,20 +1,11 @@
 <x-app-layout>
     <x-slot name="title">Notification and Advert Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="row g-4 mb-4">
         <div class="card shadow mb-4">
             {{-- Card Header --}}
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Notification Form</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Notification and Advert Form</h6>
                 <div class="d-flex align-items-center">
                   
 

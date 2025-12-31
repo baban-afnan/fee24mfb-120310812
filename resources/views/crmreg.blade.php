@@ -1,78 +1,22 @@
 <x-app-layout>
   <x-slot name="title">BVN CRM Request Form</x-slot>
-      <div class="page-body">
-    <div class="container-fluid">
-      <div class="page-title">
-        <div class="row">
-          <div class="col-sm-6 col-12">
-          </div>
-        </div>
-      </div>
-    </div>
-
-<div class="row g-4 mb-4">
-
-    <div class="col-md-3">
-        <div class="card text-white bg-primary h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-hourglass-split fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Pending</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['pending'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Work on this request its Urgent!</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-info h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-gear-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Processing</h6>
-                <small class="text-uppercase fw-bold">Check and confirm The status</small>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['processing'] ?? 0 }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-success h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <small class="text-uppercase fw-bold">You have did a great Job</small>
-                <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Resolved</h6>
-                <h4 class="fw-bold mb-0">{{ $statusCounts['resolved'] ?? 0 }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card text-white bg-danger h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
-                <i class="bi bi-x-octagon-fill fs-1 mb-2"></i>
-                <h6 class="text-uppercase fw-bold">Rejected</h6>
-                <h4 class="fw-bold mb-2">{{ $statusCounts['rejected'] ?? 0 }}</h4>
-                <small class="text-uppercase fw-bold">Don’t give up — Kept accepting Request</small>
-            </div>
-        </div>
-    </div>
-</div>
+    
+@push('styles')
+<x-status-cards :statusCounts="$statusCounts" />
 
 
 
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">BVN CRM request</h6>
+        <h6 class="m-0 font-weight-bold text-primary">BVN CRM Request Form</h6>
         <div class="dropdown no-arrow">
             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical text-gray-400"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                 <div class="dropdown-header">Export Options:</div>
-                <a class="dropdown-item" href="#"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export as CSV</a>
-                <a class="dropdown-item" href="#"><i class="bi bi-file-excel me-2"></i>Export as Excel</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#"><i class="bi bi-printer me-2"></i>Print Records</a>
+                <a class="dropdown-item" href="{{ route('crmreg.export.pending') }}"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export as CSV</a>
             </div>
         </div>
     </div>
@@ -132,6 +76,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Reference</th>
+                        <th>Agent Name</th>
                         <th>Batch ID</th>
                         <th>Ticket ID</th>
                         <th>Status</th>
@@ -145,6 +90,7 @@
                         <tr>
                             <td>{{ $enrollment->id }}</td>
                             <td>{{ $enrollment->reference }}</td>
+                              <td>{{ $enrollment->performed_by }}</td>
                             <td>{{ $enrollment->batch_id }}</td>
                             <td>{{ $enrollment->ticket_id }}</td>
                             <td>
