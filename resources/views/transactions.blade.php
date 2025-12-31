@@ -219,7 +219,7 @@
                     {{-- Pagination --}}
                     @if ($transactions->hasPages())
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $transactions->withQueryString()->links('vendor.pagination.custom') }}
+                            {{ $transactions->onEachSide(1)->withQueryString()->links('vendor.pagination.custom') }}
                         </div>
                     @endif
 
