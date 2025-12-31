@@ -137,7 +137,7 @@ class DashboardController extends Controller
 
         // --- NEW: Today's Data for Redesign ---
         $today = Carbon::today();
-        $todayTransactions = Transaction::whereDate('created_at', $today)->latest()->get();
+        $todayTransactions = Transaction::whereDate('created_at', $today)->latest()->take(10)->get();
         
         $dailyStats = [
             'total' => $todayTransactions->count(),
